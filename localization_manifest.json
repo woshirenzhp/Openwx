@@ -1,0 +1,22 @@
+{
+  "edition": "Openjs-wx 0.7 English",
+  "language": "en",
+  "source_version": "0.7",
+  "translated_constants": {
+    "app.py": 83,
+    "bootstrap.py": 0,
+    "engine.py": 15,
+    "formats.py": 0,
+    "midi_out.py": 2,
+    "song.py": 37,
+    "smf.py": 10,
+    "lyrics.py": 24,
+    "media.py": 15,
+    "presentation.py": 105,
+    "timeline.py": 79,
+    "check_dependencies.py": 0,
+    "build_portable.py": 1
+  },
+  "lyric_content_translated": false,
+  "method": "AST string-constant replacement; playback algorithms unchanged"
+}
