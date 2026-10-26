@@ -1,0 +1,405 @@
+2026-10-18 22:58:52,529 INFO Loaded CE000001.MI3：2 music resources, 2 audio tracks
+2026-10-18 22:58:52,576 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-18 22:58:52,593 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-18 22:58:52,611 INFO MDT 0 ready; audio [0, 1]；197.88 s
+2026-10-18 22:58:52,654 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-18 22:58:53,718 INFO Loaded CE053877.MI3：2 music resources, 0 audio tracks
+2026-10-18 22:58:53,737 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-18 22:58:53,762 INFO Note: MDT 0 selects audio [0, 1], but the matching SD3 was not provided
+2026-10-18 22:58:53,775 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-18 22:58:53,793 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-18 22:59:35,992 INFO Loaded CE000001.MI3：2 music resources, 2 audio tracks
+2026-10-18 22:59:36,019 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-18 22:59:36,050 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-18 22:59:36,075 INFO MDT 0 ready; audio [0, 1]；197.88 s
+2026-10-18 22:59:36,125 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-18 22:59:37,165 INFO Loaded CE053877.MI3：2 music resources, 0 audio tracks
+2026-10-18 22:59:37,181 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-18 22:59:37,202 INFO Note: MDT 0 selects audio [0, 1], but the matching SD3 was not provided
+2026-10-18 22:59:37,213 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-18 22:59:37,236 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-25 22:20:31,852 INFO Loaded CE000001.MI3：2 music resources, 2 audio tracks
+2026-10-25 22:20:31,873 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-25 22:20:31,888 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-25 22:20:31,929 INFO MDT 0 ready; audio [0, 1]；197.88 s
+2026-10-25 22:20:31,948 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-25 22:20:32,785 INFO Loaded CE053877.MI3：2 music resources, 0 audio tracks
+2026-10-25 22:20:32,794 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-25 22:20:32,811 INFO Note: MDT 0 selects audio [0, 1], but the matching SD3 was not provided
+2026-10-25 22:20:32,820 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-25 22:20:32,838 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-25 22:48:28,425 INFO Loaded CE000001.MI3：2 music resources, 2 audio tracks
+2026-10-25 22:48:28,447 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-25 22:48:28,464 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-25 22:48:28,508 INFO MDT 0 ready; audio [0, 1]；197.88 s
+2026-10-25 22:48:28,526 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-25 22:48:29,330 INFO Loaded CE053877.MI3：2 music resources, 0 audio tracks
+2026-10-25 22:48:29,341 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-25 22:48:29,358 INFO Note: MDT 0 selects audio [0, 1], but the matching SD3 was not provided
+2026-10-25 22:48:29,368 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-25 22:48:29,386 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-25 23:26:14,073 INFO Loaded song.mid：1 music resources, 1 audio tracks
+2026-10-25 23:26:14,093 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-25 23:26:14,108 INFO Note: Original SMF channels are preserved. Tracks on the same port/channel share programs and controllers; use separate ports for independent sounds.
+2026-10-25 23:26:19,540 INFO Loaded CE000001.MI3：2 music resources, 2 audio tracks
+2026-10-25 23:26:19,548 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-25 23:26:19,563 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-25 23:26:19,624 INFO MDT 0 ready; audio [0, 1]；197.88 s
+2026-10-25 23:26:19,641 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-25 23:26:20,468 INFO Loaded CE053877.MI3：2 music resources, 0 audio tracks
+2026-10-25 23:26:20,477 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-25 23:26:20,493 INFO Note: MDT 0 selects audio [0, 1], but the matching SD3 was not provided
+2026-10-25 23:26:20,502 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-25 23:26:20,519 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-25 23:34:30,909 INFO Loaded song.mid：1 music resources, 1 audio tracks
+2026-10-25 23:34:30,932 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-25 23:34:30,949 INFO Note: Original SMF channels are preserved. Tracks on the same port/channel share programs and controllers; use separate ports for independent sounds.
+2026-10-25 23:34:37,374 INFO Loaded CE000001.MI3：2 music resources, 2 audio tracks
+2026-10-25 23:34:37,383 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-25 23:34:37,402 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-25 23:34:37,454 INFO MDT 0 ready; audio [0, 1]；197.88 s
+2026-10-25 23:34:37,471 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-25 23:34:38,279 INFO Loaded CE053877.MI3：2 music resources, 0 audio tracks
+2026-10-25 23:34:38,291 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-25 23:34:38,309 INFO Note: MDT 0 selects audio [0, 1], but the matching SD3 was not provided
+2026-10-25 23:34:38,321 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-25 23:34:38,339 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-25 23:34:38,870 INFO Loaded solo.wav：1 music resources, 1 audio tracks
+2026-10-25 23:34:38,890 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-25 23:34:39,022 INFO Audio 0 ready; audio [0]；12.85 s
+2026-10-25 23:34:39,227 INFO Audio 0 ready; audio [0]；0.40 s
+2026-10-25 23:34:40,671 INFO Loaded CE000001.MI3：2 music resources, 0 audio tracks
+2026-10-25 23:34:40,682 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-25 23:34:40,701 INFO Note: MDT 0 selects audio [0, 1], but the matching SD3 was not provided
+2026-10-25 23:34:40,710 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-26 00:05:05,807 INFO Loaded song.mid：1 music resources, 1 audio tracks
+2026-10-26 00:05:05,828 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 00:05:05,845 INFO Note: Original SMF channels are preserved. Tracks on the same port/channel share programs and controllers; use separate ports for independent sounds.
+2026-10-26 00:05:12,176 INFO Loaded CE000001.MI3：2 music resources, 2 audio tracks
+2026-10-26 00:05:12,185 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 00:05:12,209 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-26 00:05:12,255 INFO MDT 0 ready; audio [0, 1]；197.88 s
+2026-10-26 00:05:12,273 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-26 00:05:13,093 INFO Loaded CE053877.MI3：2 music resources, 0 audio tracks
+2026-10-26 00:05:13,104 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 00:05:13,126 INFO Note: MDT 0 selects audio [0, 1], but the matching SD3 was not provided
+2026-10-26 00:05:13,150 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-26 00:05:13,190 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-26 00:05:13,811 INFO Loaded solo.wav：1 music resources, 1 audio tracks
+2026-10-26 00:05:13,831 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 00:05:13,954 INFO Audio 0 ready; audio [0]；12.85 s
+2026-10-26 00:05:14,158 INFO Audio 0 ready; audio [0]；0.40 s
+2026-10-26 00:05:15,535 INFO Loaded CE000001.MI3：2 music resources, 0 audio tracks
+2026-10-26 00:05:15,546 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 00:05:15,564 INFO Note: MDT 0 selects audio [0, 1], but the matching SD3 was not provided
+2026-10-26 00:05:15,574 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-26 00:05:17,843 INFO Loaded lyrics.mid：1 music resources, 0 audio tracks
+2026-10-26 00:05:17,865 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 00:05:17,888 INFO Note: Original SMF channels are preserved. Tracks on the same port/channel share programs and controllers; use separate ports for independent sounds.
+2026-10-26 00:09:51,075 INFO Loaded song.mid：1 music resources, 1 audio tracks
+2026-10-26 00:09:51,095 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 00:09:51,113 INFO Note: Original SMF channels are preserved. Tracks on the same port/channel share programs and controllers; use separate ports for independent sounds.
+2026-10-26 00:09:57,652 INFO Loaded CE000001.MI3：2 music resources, 2 audio tracks
+2026-10-26 00:09:57,664 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 00:09:57,689 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-26 00:09:57,734 INFO MDT 0 ready; audio [0, 1]；197.88 s
+2026-10-26 00:09:57,752 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-26 00:09:58,567 INFO Loaded CE053877.MI3：2 music resources, 0 audio tracks
+2026-10-26 00:09:58,593 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 00:09:58,635 INFO Note: MDT 0 selects audio [0, 1], but the matching SD3 was not provided
+2026-10-26 00:09:58,659 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-26 00:09:58,700 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-26 00:09:59,398 INFO Loaded solo.wav：1 music resources, 1 audio tracks
+2026-10-26 00:09:59,417 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 00:09:59,537 INFO Audio 0 ready; audio [0]；12.85 s
+2026-10-26 00:09:59,708 INFO Audio 0 ready; audio [0]；0.40 s
+2026-10-26 00:10:01,095 INFO Loaded CE000001.MI3：2 music resources, 0 audio tracks
+2026-10-26 00:10:01,107 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 00:10:01,132 INFO Note: MDT 0 selects audio [0, 1], but the matching SD3 was not provided
+2026-10-26 00:10:01,145 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-26 00:10:02,789 INFO Loaded lyrics.mid：1 music resources, 0 audio tracks
+2026-10-26 00:10:02,805 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 00:10:02,835 INFO Note: Original SMF channels are preserved. Tracks on the same port/channel share programs and controllers; use separate ports for independent sounds.
+2026-10-26 00:11:13,553 INFO Loaded lyrics.mid：1 music resources, 0 audio tracks
+2026-10-26 00:11:13,590 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 00:11:13,632 INFO Note: Original SMF channels are preserved. Tracks on the same port/channel share programs and controllers; use separate ports for independent sounds.
+2026-10-26 00:12:43,820 INFO Loaded song.mid：1 music resources, 1 audio tracks
+2026-10-26 00:12:43,849 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 00:12:43,871 INFO Note: Original SMF channels are preserved. Tracks on the same port/channel share programs and controllers; use separate ports for independent sounds.
+2026-10-26 00:12:50,372 INFO Loaded CE000001.MI3：2 music resources, 2 audio tracks
+2026-10-26 00:12:50,384 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 00:12:50,420 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-26 00:12:50,454 INFO MDT 0 ready; audio [0, 1]；197.88 s
+2026-10-26 00:12:50,508 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-26 00:12:51,312 INFO Loaded CE053877.MI3：2 music resources, 0 audio tracks
+2026-10-26 00:12:51,332 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 00:12:51,356 INFO Note: MDT 0 selects audio [0, 1], but the matching SD3 was not provided
+2026-10-26 00:12:51,366 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-26 00:12:51,386 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-26 00:12:51,887 INFO Loaded solo.wav：1 music resources, 1 audio tracks
+2026-10-26 00:12:51,908 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 00:12:52,034 INFO Audio 0 ready; audio [0]；12.85 s
+2026-10-26 00:12:52,260 INFO Audio 0 ready; audio [0]；0.40 s
+2026-10-26 00:12:53,618 INFO Loaded CE000001.MI3：2 music resources, 0 audio tracks
+2026-10-26 00:12:53,631 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 00:12:53,652 INFO Note: MDT 0 selects audio [0, 1], but the matching SD3 was not provided
+2026-10-26 00:12:53,664 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-26 00:12:55,286 INFO Loaded lyrics.mid：1 music resources, 0 audio tracks
+2026-10-26 00:12:55,309 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 00:12:55,351 INFO Note: Original SMF channels are preserved. Tracks on the same port/channel share programs and controllers; use separate ports for independent sounds.
+2026-10-26 00:23:39,187 INFO Loaded song.mid：1 music resources, 1 audio tracks
+2026-10-26 00:23:39,208 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 00:23:39,226 INFO Note: Original SMF channels are preserved. Tracks on the same port/channel share programs and controllers; use separate ports for independent sounds.
+2026-10-26 00:23:52,231 INFO Loaded CE000001.MI3：2 music resources, 2 audio tracks
+2026-10-26 00:23:52,245 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 00:23:52,264 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-26 00:23:52,310 INFO MDT 0 ready; audio [0, 1]；197.88 s
+2026-10-26 00:23:52,331 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-26 00:23:53,231 INFO Loaded CE053877.MI3：2 music resources, 0 audio tracks
+2026-10-26 00:23:53,255 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 00:23:53,295 INFO Note: MDT 0 selects audio [0, 1], but the matching SD3 was not provided
+2026-10-26 00:23:53,320 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-26 00:23:53,362 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-26 00:23:54,032 INFO Loaded solo.wav：1 music resources, 1 audio tracks
+2026-10-26 00:23:54,058 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 00:23:54,186 INFO Audio 0 ready; audio [0]；12.85 s
+2026-10-26 00:23:54,410 INFO Audio 0 ready; audio [0]；0.40 s
+2026-10-26 00:23:56,176 INFO Loaded CE000001.MI3：2 music resources, 0 audio tracks
+2026-10-26 00:23:56,190 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 00:23:56,210 INFO Note: MDT 0 selects audio [0, 1], but the matching SD3 was not provided
+2026-10-26 00:23:56,222 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-26 00:23:57,910 INFO Loaded lyrics.mid：1 music resources, 0 audio tracks
+2026-10-26 00:23:57,925 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 00:23:57,945 INFO Note: Original SMF channels are preserved. Tracks on the same port/channel share programs and controllers; use separate ports for independent sounds.
+2026-10-26 00:26:36,842 INFO Loaded song.mid：1 music resources, 1 audio tracks
+2026-10-26 00:26:36,868 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 00:26:36,903 INFO Note: Original SMF channels are preserved. Tracks on the same port/channel share programs and controllers; use separate ports for independent sounds.
+2026-10-26 00:26:46,235 INFO Loaded CE000001.MI3：2 music resources, 2 audio tracks
+2026-10-26 00:26:46,247 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 00:26:46,276 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-26 00:26:46,310 INFO MDT 0 ready; audio [0, 1]；197.88 s
+2026-10-26 00:26:46,329 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-26 00:26:47,145 INFO Loaded CE053877.MI3：2 music resources, 0 audio tracks
+2026-10-26 00:26:47,156 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 00:26:47,202 INFO Note: MDT 0 selects audio [0, 1], but the matching SD3 was not provided
+2026-10-26 00:26:47,225 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-26 00:26:47,267 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-26 00:26:47,872 INFO Loaded solo.wav：1 music resources, 1 audio tracks
+2026-10-26 00:26:47,892 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 00:26:48,012 INFO Audio 0 ready; audio [0]；12.85 s
+2026-10-26 00:26:48,323 INFO Audio 0 ready; audio [0]；0.40 s
+2026-10-26 00:26:49,530 INFO Loaded CE000001.MI3：2 music resources, 0 audio tracks
+2026-10-26 00:26:49,544 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 00:26:49,563 INFO Note: MDT 0 selects audio [0, 1], but the matching SD3 was not provided
+2026-10-26 00:26:49,577 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-26 00:26:51,194 INFO Loaded lyrics.mid：1 music resources, 0 audio tracks
+2026-10-26 00:26:51,215 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 00:26:51,262 INFO Note: Original SMF channels are preserved. Tracks on the same port/channel share programs and controllers; use separate ports for independent sounds.
+2026-10-26 00:46:24,077 INFO Loaded song.mid：1 music resources, 1 audio tracks
+2026-10-26 00:46:24,106 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 00:46:24,139 INFO Note: Original SMF channels are preserved. Tracks on the same port/channel share programs and controllers; use separate ports for independent sounds.
+2026-10-26 00:46:33,388 INFO Loaded CE000001.MI3：2 music resources, 2 audio tracks
+2026-10-26 00:46:33,401 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 00:46:33,422 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-26 00:46:33,469 INFO MDT 0 ready; audio [0, 1]；197.88 s
+2026-10-26 00:46:33,490 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-26 00:46:34,505 INFO Loaded CE053877.MI3：2 music resources, 0 audio tracks
+2026-10-26 00:46:34,520 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 00:46:34,555 INFO Note: MDT 0 selects audio [0, 1], but the matching SD3 was not provided
+2026-10-26 00:46:34,579 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-26 00:46:34,615 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-26 00:46:34,975 INFO Loaded first.mid：1 music resources, 1 audio tracks
+2026-10-26 00:46:34,993 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 00:46:35,028 INFO Note: SMF files start at the same time and retain their own tempo maps; song durations are not automatically aligned.
+2026-10-26 00:46:35,066 INFO Note: Original SMF channels are preserved. Tracks on the same port/channel share programs and controllers; use separate ports for independent sounds.
+2026-10-26 00:46:35,159 INFO SMF 0 ready; audio [0]；0.50 s
+2026-10-26 00:46:35,436 INFO Loaded first.mid：1 music resources, 1 audio tracks
+2026-10-26 00:46:35,451 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 00:46:35,491 INFO Note: SMF files start at the same time and retain their own tempo maps; song durations are not automatically aligned.
+2026-10-26 00:46:35,529 INFO Note: Original SMF channels are preserved. Tracks on the same port/channel share programs and controllers; use separate ports for independent sounds.
+2026-10-26 00:46:35,663 INFO SMF 0 ready; audio [0]；0.62 s
+2026-10-26 00:46:36,685 INFO Loaded first.mid：1 music resources, 1 audio tracks
+2026-10-26 00:46:36,692 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 00:46:36,723 INFO Note: SMF files start at the same time and retain their own tempo maps; song durations are not automatically aligned.
+2026-10-26 00:46:36,756 INFO Note: Original SMF channels are preserved. Tracks on the same port/channel share programs and controllers; use separate ports for independent sounds.
+2026-10-26 00:46:36,827 INFO SMF 0 ready; audio [0]；0.50 s
+2026-10-26 00:46:37,359 INFO Loaded first.mid：1 music resources, 1 audio tracks
+2026-10-26 00:46:37,380 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 00:46:37,417 INFO Note: SMF files start at the same time and retain their own tempo maps; song durations are not automatically aligned.
+2026-10-26 00:46:37,451 INFO Note: Original SMF channels are preserved. Tracks on the same port/channel share programs and controllers; use separate ports for independent sounds.
+2026-10-26 00:46:37,516 INFO SMF 0 ready; audio [0]；0.50 s
+2026-10-26 00:46:37,959 INFO Loaded first.mid：1 music resources, 1 audio tracks
+2026-10-26 00:46:37,975 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 00:46:38,016 INFO Note: SMF files start at the same time and retain their own tempo maps; song durations are not automatically aligned.
+2026-10-26 00:46:38,053 INFO Note: Original SMF channels are preserved. Tracks on the same port/channel share programs and controllers; use separate ports for independent sounds.
+2026-10-26 00:46:39,069 INFO Loaded first.mid：1 music resources, 1 audio tracks
+2026-10-26 00:46:39,098 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 00:46:39,145 INFO Note: SMF files start at the same time and retain their own tempo maps; song durations are not automatically aligned.
+2026-10-26 00:46:39,181 INFO Note: Original SMF channels are preserved. Tracks on the same port/channel share programs and controllers; use separate ports for independent sounds.
+2026-10-26 00:46:39,271 INFO SMF 0 ready; audio [0]；0.50 s
+2026-10-26 00:46:39,558 INFO Loaded first.mid：1 music resources, 1 audio tracks
+2026-10-26 00:46:39,576 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 00:46:39,619 INFO Note: SMF files start at the same time and retain their own tempo maps; song durations are not automatically aligned.
+2026-10-26 00:46:39,643 INFO Note: Original SMF channels are preserved. Tracks on the same port/channel share programs and controllers; use separate ports for independent sounds.
+2026-10-26 00:46:40,003 INFO Loaded first.mid：1 music resources, 1 audio tracks
+2026-10-26 00:46:40,012 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 00:46:40,045 INFO Note: SMF files start at the same time and retain their own tempo maps; song durations are not automatically aligned.
+2026-10-26 00:46:40,079 INFO Note: Original SMF channels are preserved. Tracks on the same port/channel share programs and controllers; use separate ports for independent sounds.
+2026-10-26 00:46:40,712 INFO Loaded first.mid：1 music resources, 1 audio tracks
+2026-10-26 00:46:40,723 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 00:46:40,754 INFO Note: SMF files start at the same time and retain their own tempo maps; song durations are not automatically aligned.
+2026-10-26 00:46:40,795 INFO Note: Original SMF channels are preserved. Tracks on the same port/channel share programs and controllers; use separate ports for independent sounds.
+2026-10-26 00:46:41,622 INFO Loaded solo.wav：1 music resources, 1 audio tracks
+2026-10-26 00:46:41,643 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 00:46:41,759 INFO Audio 0 ready; audio [0]；12.85 s
+2026-10-26 00:46:41,957 INFO Audio 0 ready; audio [0]；0.40 s
+2026-10-26 00:46:43,179 INFO Loaded CE000001.MI3：2 music resources, 0 audio tracks
+2026-10-26 00:46:43,189 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 00:46:43,205 INFO Note: MDT 0 selects audio [0, 1], but the matching SD3 was not provided
+2026-10-26 00:46:43,215 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-26 00:46:44,880 INFO Loaded lyrics.mid：1 music resources, 0 audio tracks
+2026-10-26 00:46:44,900 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 00:46:44,930 INFO Note: Original SMF channels are preserved. Tracks on the same port/channel share programs and controllers; use separate ports for independent sounds.
+2026-10-26 08:33:19,237 INFO Loaded song.mid：1 music resources, 1 audio tracks
+2026-10-26 08:33:19,261 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 08:33:19,300 INFO Note: Original SMF channels are preserved. Tracks on the same port/channel share programs and controllers; use separate ports for independent sounds.
+2026-10-26 08:33:28,746 INFO Loaded CE000001.MI3：2 music resources, 2 audio tracks
+2026-10-26 08:33:28,769 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 08:33:28,805 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-26 08:33:28,826 INFO MDT 0 ready; audio [0, 1]；197.88 s
+2026-10-26 08:33:28,875 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-26 08:33:29,850 INFO Loaded CE053877.MI3：2 music resources, 0 audio tracks
+2026-10-26 08:33:29,876 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 08:33:29,915 INFO Note: MDT 0 selects audio [0, 1], but the matching SD3 was not provided
+2026-10-26 08:33:29,938 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-26 08:33:29,977 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-26 08:33:30,467 INFO Loaded first.mid：1 music resources, 1 audio tracks
+2026-10-26 08:33:30,492 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 08:33:30,534 INFO Note: SMF files start at the same time and retain their own tempo maps; song durations are not automatically aligned.
+2026-10-26 08:33:30,579 INFO Note: Original SMF channels are preserved. Tracks on the same port/channel share programs and controllers; use separate ports for independent sounds.
+2026-10-26 08:33:30,674 INFO SMF 0 ready; audio [0]；0.50 s
+2026-10-26 08:33:30,954 INFO Loaded first.mid：1 music resources, 1 audio tracks
+2026-10-26 08:33:30,972 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 08:33:31,020 INFO Note: SMF files start at the same time and retain their own tempo maps; song durations are not automatically aligned.
+2026-10-26 08:33:31,060 INFO Note: Original SMF channels are preserved. Tracks on the same port/channel share programs and controllers; use separate ports for independent sounds.
+2026-10-26 08:33:31,202 INFO SMF 0 ready; audio [0]；0.62 s
+2026-10-26 08:33:32,410 INFO Loaded first.mid：1 music resources, 1 audio tracks
+2026-10-26 08:33:32,436 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 08:33:32,484 INFO Note: SMF files start at the same time and retain their own tempo maps; song durations are not automatically aligned.
+2026-10-26 08:33:32,522 INFO Note: Original SMF channels are preserved. Tracks on the same port/channel share programs and controllers; use separate ports for independent sounds.
+2026-10-26 08:33:32,592 INFO SMF 0 ready; audio [0]；0.50 s
+2026-10-26 08:33:33,220 INFO Loaded first.mid：1 music resources, 1 audio tracks
+2026-10-26 08:33:33,242 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 08:33:33,280 INFO Note: SMF files start at the same time and retain their own tempo maps; song durations are not automatically aligned.
+2026-10-26 08:33:33,300 INFO Note: Original SMF channels are preserved. Tracks on the same port/channel share programs and controllers; use separate ports for independent sounds.
+2026-10-26 08:33:33,343 INFO SMF 0 ready; audio [0]；0.50 s
+2026-10-26 08:33:33,863 INFO Loaded first.mid：1 music resources, 1 audio tracks
+2026-10-26 08:33:33,879 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 08:33:33,912 INFO Note: SMF files start at the same time and retain their own tempo maps; song durations are not automatically aligned.
+2026-10-26 08:33:33,943 INFO Note: Original SMF channels are preserved. Tracks on the same port/channel share programs and controllers; use separate ports for independent sounds.
+2026-10-26 08:33:34,997 INFO Loaded first.mid：1 music resources, 1 audio tracks
+2026-10-26 08:33:35,020 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 08:33:35,060 INFO Note: SMF files start at the same time and retain their own tempo maps; song durations are not automatically aligned.
+2026-10-26 08:33:35,102 INFO Note: Original SMF channels are preserved. Tracks on the same port/channel share programs and controllers; use separate ports for independent sounds.
+2026-10-26 08:33:35,195 INFO SMF 0 ready; audio [0]；0.50 s
+2026-10-26 08:33:35,488 INFO Loaded first.mid：1 music resources, 1 audio tracks
+2026-10-26 08:33:35,507 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 08:33:35,553 INFO Note: SMF files start at the same time and retain their own tempo maps; song durations are not automatically aligned.
+2026-10-26 08:33:35,591 INFO Note: Original SMF channels are preserved. Tracks on the same port/channel share programs and controllers; use separate ports for independent sounds.
+2026-10-26 08:33:36,179 INFO Loaded first.mid：1 music resources, 1 audio tracks
+2026-10-26 08:33:36,202 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 08:33:36,229 INFO Note: SMF files start at the same time and retain their own tempo maps; song durations are not automatically aligned.
+2026-10-26 08:33:36,257 INFO Note: Original SMF channels are preserved. Tracks on the same port/channel share programs and controllers; use separate ports for independent sounds.
+2026-10-26 08:33:37,087 INFO Loaded first.mid：1 music resources, 1 audio tracks
+2026-10-26 08:33:37,108 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 08:33:37,149 INFO Note: SMF files start at the same time and retain their own tempo maps; song durations are not automatically aligned.
+2026-10-26 08:33:37,189 INFO Note: Original SMF channels are preserved. Tracks on the same port/channel share programs and controllers; use separate ports for independent sounds.
+2026-10-26 08:33:37,769 INFO Loaded first.mid：1 music resources, 1 audio tracks
+2026-10-26 08:33:37,786 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 08:33:37,820 INFO Note: SMF files start at the same time and retain their own tempo maps; song durations are not automatically aligned.
+2026-10-26 08:33:37,852 INFO Note: Original SMF channels are preserved. Tracks on the same port/channel share programs and controllers; use separate ports for independent sounds.
+2026-10-26 08:33:38,630 INFO Loaded solo.wav：1 music resources, 1 audio tracks
+2026-10-26 08:33:38,648 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 08:33:38,754 INFO Audio 0 ready; audio [0]；12.85 s
+2026-10-26 08:33:38,896 INFO Audio 0 ready; audio [0]；0.40 s
+2026-10-26 08:33:39,973 INFO Loaded CE000001.MI3：2 music resources, 0 audio tracks
+2026-10-26 08:33:39,984 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 08:33:40,003 INFO Note: MDT 0 selects audio [0, 1], but the matching SD3 was not provided
+2026-10-26 08:33:40,013 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-26 08:33:41,684 INFO Loaded lyrics.mid：1 music resources, 0 audio tracks
+2026-10-26 08:33:41,707 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 08:33:41,730 INFO Note: Original SMF channels are preserved. Tracks on the same port/channel share programs and controllers; use separate ports for independent sounds.
+2026-10-26 19:58:19,147 INFO Loaded song.mid：1 music resources, 1 audio tracks
+2026-10-26 19:58:19,172 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 19:58:19,202 INFO Note: Original SMF channels are preserved. Tracks on the same port/channel share programs and controllers; use separate ports for independent sounds.
+2026-10-26 19:58:29,095 INFO Loaded CE000001.MI3：2 music resources, 2 audio tracks
+2026-10-26 19:58:29,114 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 19:58:29,140 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-26 19:58:29,195 INFO MDT 0 ready; audio [0, 1]；197.88 s
+2026-10-26 19:58:29,215 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-26 19:58:30,080 INFO Loaded CE053877.MI3：2 music resources, 0 audio tracks
+2026-10-26 19:58:30,100 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 19:58:30,119 INFO Note: MDT 0 selects audio [0, 1], but the matching SD3 was not provided
+2026-10-26 19:58:30,130 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-26 19:58:30,153 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-26 19:58:30,658 INFO Loaded first.mid：1 music resources, 1 audio tracks
+2026-10-26 19:58:30,674 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 19:58:30,698 INFO Note: SMF files start at the same time and retain their own tempo maps; song durations are not automatically aligned.
+2026-10-26 19:58:30,722 INFO Note: Original SMF channels are preserved. Tracks on the same port/channel share programs and controllers; use separate ports for independent sounds.
+2026-10-26 19:58:30,800 INFO SMF 0 ready; audio [0]；0.50 s
+2026-10-26 19:58:31,076 INFO Loaded first.mid：1 music resources, 1 audio tracks
+2026-10-26 19:58:31,092 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 19:58:31,127 INFO Note: SMF files start at the same time and retain their own tempo maps; song durations are not automatically aligned.
+2026-10-26 19:58:31,157 INFO Note: Original SMF channels are preserved. Tracks on the same port/channel share programs and controllers; use separate ports for independent sounds.
+2026-10-26 19:58:31,283 INFO SMF 0 ready; audio [0]；0.62 s
+2026-10-26 19:58:32,384 INFO Loaded first.mid：1 music resources, 1 audio tracks
+2026-10-26 19:58:32,411 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 19:58:32,450 INFO Note: SMF files start at the same time and retain their own tempo maps; song durations are not automatically aligned.
+2026-10-26 19:58:32,495 INFO Note: Original SMF channels are preserved. Tracks on the same port/channel share programs and controllers; use separate ports for independent sounds.
+2026-10-26 19:58:32,577 INFO SMF 0 ready; audio [0]；0.50 s
+2026-10-26 19:58:33,235 INFO Loaded first.mid：1 music resources, 1 audio tracks
+2026-10-26 19:58:33,251 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 19:58:33,267 INFO Note: SMF files start at the same time and retain their own tempo maps; song durations are not automatically aligned.
+2026-10-26 19:58:33,286 INFO Note: Original SMF channels are preserved. Tracks on the same port/channel share programs and controllers; use separate ports for independent sounds.
+2026-10-26 19:58:33,360 INFO SMF 0 ready; audio [0]；0.50 s
+2026-10-26 19:58:33,944 INFO Loaded first.mid：1 music resources, 1 audio tracks
+2026-10-26 19:58:33,957 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 19:58:33,976 INFO Note: SMF files start at the same time and retain their own tempo maps; song durations are not automatically aligned.
+2026-10-26 19:58:33,994 INFO Note: Original SMF channels are preserved. Tracks on the same port/channel share programs and controllers; use separate ports for independent sounds.
+2026-10-26 19:58:34,953 INFO Loaded first.mid：1 music resources, 1 audio tracks
+2026-10-26 19:58:34,968 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 19:58:34,994 INFO Note: SMF files start at the same time and retain their own tempo maps; song durations are not automatically aligned.
+2026-10-26 19:58:35,016 INFO Note: Original SMF channels are preserved. Tracks on the same port/channel share programs and controllers; use separate ports for independent sounds.
+2026-10-26 19:58:35,088 INFO SMF 0 ready; audio [0]；0.50 s
+2026-10-26 19:58:35,364 INFO Loaded first.mid：1 music resources, 1 audio tracks
+2026-10-26 19:58:35,379 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 19:58:35,415 INFO Note: SMF files start at the same time and retain their own tempo maps; song durations are not automatically aligned.
+2026-10-26 19:58:35,448 INFO Note: Original SMF channels are preserved. Tracks on the same port/channel share programs and controllers; use separate ports for independent sounds.
+2026-10-26 19:58:35,853 INFO Loaded first.mid：1 music resources, 1 audio tracks
+2026-10-26 19:58:35,866 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 19:58:35,889 INFO Note: SMF files start at the same time and retain their own tempo maps; song durations are not automatically aligned.
+2026-10-26 19:58:35,911 INFO Note: Original SMF channels are preserved. Tracks on the same port/channel share programs and controllers; use separate ports for independent sounds.
+2026-10-26 19:58:36,038 INFO SMF 0 ready; audio [0]；0.50 s
+2026-10-26 19:58:36,772 INFO Loaded first.mid：1 music resources, 1 audio tracks
+2026-10-26 19:58:36,784 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 19:58:36,813 INFO Note: SMF files start at the same time and retain their own tempo maps; song durations are not automatically aligned.
+2026-10-26 19:58:36,835 INFO Note: Original SMF channels are preserved. Tracks on the same port/channel share programs and controllers; use separate ports for independent sounds.
+2026-10-26 19:58:37,471 INFO Loaded first.mid：1 music resources, 1 audio tracks
+2026-10-26 19:58:37,491 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 19:58:37,535 INFO Note: SMF files start at the same time and retain their own tempo maps; song durations are not automatically aligned.
+2026-10-26 19:58:37,565 INFO Note: Original SMF channels are preserved. Tracks on the same port/channel share programs and controllers; use separate ports for independent sounds.
+2026-10-26 19:58:38,158 INFO Loaded first.mid：1 music resources, 1 audio tracks
+2026-10-26 19:58:38,169 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 19:58:38,189 INFO Note: SMF files start at the same time and retain their own tempo maps; song durations are not automatically aligned.
+2026-10-26 19:58:38,216 INFO Note: Original SMF channels are preserved. Tracks on the same port/channel share programs and controllers; use separate ports for independent sounds.
+2026-10-26 19:58:38,924 INFO Loaded solo.wav：1 music resources, 1 audio tracks
+2026-10-26 19:58:38,938 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 19:58:39,047 INFO Audio 0 ready; audio [0]；12.85 s
+2026-10-26 19:58:39,361 INFO Audio 0 ready; audio [0]；0.40 s
+2026-10-26 19:58:40,660 INFO Loaded CE000001.MI3：2 music resources, 0 audio tracks
+2026-10-26 19:58:40,683 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 19:58:40,723 INFO Note: MDT 0 selects audio [0, 1], but the matching SD3 was not provided
+2026-10-26 19:58:40,743 INFO Note: Auxiliary melody streams are not played; proprietary controls and original mixing are approximate
+2026-10-26 19:58:43,243 INFO Loaded lyrics.mid：1 music resources, 0 audio tracks
+2026-10-26 19:58:43,254 INFO Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.
+2026-10-26 19:58:43,271 INFO Note: Original SMF channels are preserved. Tracks on the same port/channel share programs and controllers; use separate ports for independent sounds.

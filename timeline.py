@@ -2,6 +2,7 @@
 from copy import deepcopy
 from dataclasses import replace
 from pathlib import Path
+from difflib import SequenceMatcher
 import math
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
@@ -28,11 +29,13 @@ class TimelineModel:
 
     @staticmethod
     def validate(cue):
-        if not all((math.isfinite(v) for v in (cue.start, sing(cue), cue.end))) or not cue.start <= sing(cue) <= cue.end or cue.end <= cue.start:
+        if not all((math.isfinite(v) for v in (cue.start, sing(cue), cue.end))) or not 0 <= cue.start <= sing(cue) <= cue.end or cue.end <= cue.start:
             raise ValueError('Required: display <= highlight start <= clear, with clear later than display')
         for a, b, l, r in cue.spans:
             if not all((math.isfinite(v) for v in (a, b))) or a > b or (not 0 <= l < r <= len(cue.text)):
                 raise ValueError('Invalid character or segment timing')
+            if not 0 <= a <= b <= cue.end - cue.start + 1e-06:
+                raise ValueError('Character times must remain inside the line; adjust the character or line times first')
 
     def remember(self, previous=None):
         self.past.append(deepcopy(self.cues if previous is None else previous))
@@ -49,8 +52,13 @@ class TimelineModel:
     def update_line(self, index, start, color, end, text):
         old = self.cues[index]
         delta = color - start - (sing(old) - old.start)
-        spans = [(a + delta, b + delta, l, r) for a, b, l, r in old.spans] if text == old.text else []
-        self.put(index, Cue(start, end, text, spans, color, old.timing_source if text == old.text else ''))
+        mapping = {a + i: b + i for a, b, size in SequenceMatcher(None, old.text, text, autojunk=False).get_matching_blocks() for i in range(size)}
+        spans = []
+        for a, b, left, right in old.spans:
+            positions = [mapping.get(i) for i in range(left, right)]
+            if positions and positions[0] is not None and (positions == list(range(positions[0], positions[0] + len(positions)))):
+                spans.append((a + delta, b + delta, positions[0], positions[-1] + 1))
+        self.put(index, Cue(start, end, text, spans, color, old.timing_source))
 
     def shift(self, indices, offset):
         if not math.isfinite(offset):
@@ -66,8 +74,9 @@ class TimelineModel:
 
     def add(self, position):
         self.remember()
-        self.cues.append(Cue(position, position + 3, 'New lyric', sing_start=position))
-        return len(self.cues) - 1
+        index = next((i for i, cue in enumerate(self.cues) if cue.start > position), len(self.cues))
+        self.cues.insert(index, Cue(position, position + 3, 'New lyric', sing_start=position))
+        return index
 
     def delete(self, indices):
         if indices:
@@ -106,6 +115,24 @@ class TimelineModel:
         cue = self.cues[row]
         self.put(row, replace(cue, spans=[s for s in cue.spans if not (s[3] - s[2] == 1 and s[2] in chars)]))
 
+    def nudge_chars(self, row, chars, delta, edge):
+        if not chars or not math.isfinite(delta) or edge not in ('start', 'end', 'move'):
+            raise ValueError('Select timed characters and enter a valid nudge step')
+        cue = self.cues[row]
+        spans = list(cue.spans)
+        for char in chars:
+            timing = self.char_time(row, char)
+            if timing is None:
+                raise ValueError('Selected characters need individual timing; time them or split syllables first')
+            a, b = timing
+            a = round(a + (delta if edge in ('start', 'move') else 0), 3)
+            b = round(b + (delta if edge in ('end', 'move') else 0), 3)
+            if not cue.start <= a < b <= cue.end:
+                raise ValueError('Nudged character times must remain inside the line, with end after start')
+            spans = [s for s in spans if not (s[2] == char and s[3] == char + 1)]
+            spans.append((round(a - cue.start, 6), round(b - cue.start, 6), char, char + 1))
+        self.put(row, replace(cue, spans=sorted(spans, key=lambda s: s[2])))
+
     def split_segments(self, row):
         cue = self.cues[row]
         spans = []
@@ -125,8 +152,10 @@ class TimelineModel:
 
 class TimelineEditor:
 
-    def __init__(self, owner):
+    def __init__(self, owner, live=False):
         self.owner = owner
+        self.live = live
+        self.draft_job = None
         self.model = TimelineModel(owner.cues)
         self.revision = owner.cues_revision
         self.selected = self.selected_char = None
@@ -135,20 +164,23 @@ class TimelineEditor:
         self.closed = False
         self.window = tk.Toplevel(owner.app.root)
         win = self.window
-        win.title('Lyric timeline - Lines / Characters - 0.001 second input')
+        win.title('Preview lyric editor · Live lines / characters · 0.001 s' if live else 'Lyric timeline - Lines / Characters - 0.001 second input')
         win.geometry('1220x900')
         win.minsize(1050, 780)
         win.protocol('WM_DELETE_WINDOW', self.close)
         self.status = tk.StringVar(win, value='Untimed characters remain blank. Timestamp characters individually, or generate an explicit evenly spaced draft and adjust it.')
-        self.auto = tk.BooleanVar(win, value=False)
+        self.auto = tk.BooleanVar(win, value=live)
+        self.auto_text = tk.BooleanVar(win, value=live)
         self.line_zoom = tk.DoubleVar(win, value=8)
         self.char_zoom = tk.DoubleVar(win, value=100)
         self.shift_amount = tk.StringVar(win, value='0.100')
         top = ttk.Frame(win, padding=8)
         top.pack(fill='x')
-        for label, callback in [('Import...', self.load), ('Add line', self.add), ('Delete selected', self.delete), ('Undo', self.undo), ('Redo', self.redo), ('Play', owner.play), ('Pause', owner.pause), ('Apply to preview', self.apply_preview), ('Save timeline...', self.save)]:
-            ttk.Button(top, text=label, command=callback).pack(side='left', padx=2)
-        ttk.Checkbutton(top, text='Auto apply', variable=self.auto).pack(side='right')
+        for index, (label, callback) in enumerate([('Import...', self.load), ('Add line', self.add), ('Delete selected', self.delete), ('Undo', self.undo), ('Redo', self.redo), ('Play', owner.play), ('Pause', owner.pause), ('Apply to preview', self.apply_preview), ('Save timeline...', self.save)]):
+            ttk.Button(top, text=label, command=callback).grid(row=index // 5, column=index % 5, sticky='ew', padx=2, pady=2)
+        ttk.Checkbutton(top, text='Auto apply', variable=self.auto).grid(row=1, column=4)
+        ttk.Checkbutton(top, text='Auto-commit line input', variable=self.auto_text, command=self.schedule_draft).grid(row=2, column=0, columnspan=2, sticky='w')
+        ttk.Button(top, text='Find current lyric line', command=self.select_current).grid(row=2, column=2, columnspan=2, sticky='w')
         self.tree = ttk.Treeview(win, columns=('text', 'start', 'sing', 'end'), show='headings', height=6, selectmode='extended')
         for col, title, width in [('text', 'Lyrics (multiple selection)', 650), ('start', 'Display / s', 140), ('sing', 'Highlight start / s', 140), ('end', 'Clear / s', 140)]:
             self.tree.heading(col, text=title)
@@ -219,6 +251,14 @@ class TimelineEditor:
         ttk.Label(row, text='Character zoom (px/s)').pack(side='left')
         ttk.Spinbox(row, from_=10, to=1000, textvariable=self.char_zoom, width=7, command=self.draw).pack(side='left')
         ttk.Button(row, text='Refresh', command=self.draw).pack(side='left')
+        row = ttk.Frame(char_tab, padding=5)
+        row.pack(fill='x')
+        self.char_nudge_ms = tk.StringVar(win, value='10')
+        ttk.Label(row, text='Character nudge step ms').pack(side='left')
+        ttk.Spinbox(row, from_=1, to=60000, increment=1, textvariable=self.char_nudge_ms, width=7).pack(side='left', padx=3)
+        for edge, label in [('start', 'Start'), ('end', 'End'), ('move', 'Move')]:
+            for direction, sign in [(-1, '−'), (1, '+')]:
+                ttk.Button(row, text=label + ' ' + sign, command=lambda e=edge, d=direction: self.nudge_char(e, d)).pack(side='left', padx=2)
         self.char_canvas = self.make_canvas(char_tab)
         for canvas, kind in ((self.line_canvas, 'line'), (self.char_canvas, 'char')):
             canvas.bind('<Button-1>', lambda e, k=kind: self.drag_start(e, k))
@@ -228,6 +268,9 @@ class TimelineEditor:
         win.bind('<F8>', lambda e: self.mark_char_end())
         ttk.Label(win, textvariable=self.status, wraplength=1180, padding=8).pack(fill='x')
         self.refresh(0 if self.model.cues else None)
+        self.text.bind('<<Modified>>', self.text_modified)
+        for variable in self.times:
+            variable.trace_add('write', lambda *args: self.schedule_draft())
         self.after = win.after(70, self.poll)
 
     def make_canvas(self, parent):
@@ -246,6 +289,8 @@ class TimelineEditor:
 
     def operation(self, callback, select=None, message='Changed (undo available). Save JSON/CSV to retain character start/end times.'):
         try:
+            if self.auto_text.get() and (not self.commit_line(automatic=True)):
+                return
             callback()
             self.refresh(self.selected if select is None else select)
             self.status.set(message)
@@ -264,19 +309,37 @@ class TimelineEditor:
             self.tree.selection_set(str(select))
             self.tree.see(str(select))
         self.refreshing = False
+        self.selected = None
         self.select_line()
 
     def select_line(self, event=None):
         if self.refreshing:
             return
         items = self.tree.selection()
-        self.selected = int(items[0]) if items else None
-        self.text.delete('1.0', 'end')
-        if self.selected is not None:
-            cue = self.model.cues[self.selected]
-            self.text.insert('1.0', cue.text)
-            for value, number in zip(self.times, (cue.start, sing(cue), cue.end)):
-                value.set(f'{number:.3f}')
+        selected = int(items[0]) if items else None
+        if selected is not None and selected == self.selected:
+            return
+        if self.auto_text.get() and self.selected is not None and (not self.commit_line(automatic=True)):
+            self.refreshing = True
+            self.tree.selection_set(str(self.selected))
+            self.refreshing = False
+            return
+        self.selected = selected
+        self.refreshing = True
+        try:
+            self.text.delete('1.0', 'end')
+            if self.selected is not None:
+                cue = self.model.cues[self.selected]
+                self.text.insert('1.0', cue.text)
+                for value, number in zip(self.times, (cue.start, sing(cue), cue.end)):
+                    value.set(f'{number:.3f}')
+            else:
+                for value in self.times:
+                    value.set('')
+            self.text.edit_modified(False)
+            self.text.edit_reset()
+        finally:
+            self.refreshing = False
         self.refresh_chars()
         self.draw()
 
@@ -303,9 +366,71 @@ class TimelineEditor:
         for variable, number in zip(self.char_times, timing or ('', '')):
             variable.set(f'{number:.3f}' if isinstance(number, (int, float)) else '')
 
-    def commit_line(self):
-        if self.selected is not None:
-            self.operation(lambda: self.model.update_line(self.selected, *[seconds(t.get()) for t in self.times], self.text.get('1.0', 'end-1c')), message='Line committed. Changing the text resets its character timing; undo is available.')
+    def text_modified(self, event=None):
+        if self.text.edit_modified():
+            self.text.edit_modified(False)
+            self.schedule_draft()
+
+    def schedule_draft(self):
+        if self.draft_job:
+            self.window.after_cancel(self.draft_job)
+            self.draft_job = None
+        if not self.closed and (not self.refreshing) and self.auto_text.get():
+            self.draft_job = self.window.after(350, self.flush_draft)
+
+    def flush_draft(self):
+        self.draft_job = None
+        self.commit_line(automatic=True)
+
+    def commit_line(self, automatic=False):
+        if self.draft_job:
+            self.window.after_cancel(self.draft_job)
+            self.draft_job = None
+        if self.selected is None:
+            return True
+        try:
+            cue = self.model.cues[self.selected]
+            start, color, end = [seconds(t.get()) for t in self.times]
+            text = self.text.get('1.0', 'end-1c')
+            if (start, color, end, text) == (cue.start, sing(cue), cue.end, cue.text):
+                return True
+            self.model.update_line(self.selected, start, color, end, text)
+            self.tree.item(str(self.selected), values=(f'{self.selected + 1}. ' + text.replace('\n', ' / '), f'{start:.3f}', f'{color:.3f}', f'{end:.3f}'))
+            self.refresh_chars()
+            self.draw()
+            self.status.set('Line committed; unchanged text keeps its timing. Time new or replaced characters as needed.')
+            if self.auto.get():
+                self.apply_preview()
+            return True
+        except Exception as ex:
+            self.status.set(str(ex))
+            return False
+
+    def select_current(self):
+        if not self.model.cues:
+            return
+        position = self.owner.position() - self.owner.lyric_offset
+        active = [i for i, cue in enumerate(self.model.cues) if sing(cue) <= position < cue.end]
+        index = max(active, key=lambda i: sing(self.model.cues[i])) if active else min(range(len(self.model.cues)), key=lambda i: abs(self.model.cues[i].start - position))
+        self.tree.selection_set(str(index))
+        self.tree.see(str(index))
+        self.select_line()
+
+    def nudge_char(self, edge, direction):
+        if self.selected is None:
+            return
+        selected = tuple(self.char_tree.selection())
+
+        def action():
+            step = float(self.char_nudge_ms.get())
+            if not math.isfinite(step) or not 1 <= step <= 60000:
+                raise ValueError('Character nudge step must be between 1 and 60000 ms')
+            self.model.nudge_chars(self.selected, {int(i) for i in self.char_tree.selection()}, direction * step / 1000, edge)
+        self.operation(action)
+        surviving = [item for item in selected if self.char_tree.exists(item)]
+        if surviving:
+            self.char_tree.selection_set(*surviving)
+            self.select_char()
 
     def mark_line(self, index):
         self.times[index].set(f'{max(0, self.owner.position() - self.owner.lyric_offset):.3f}')
@@ -347,8 +472,12 @@ class TimelineEditor:
             self.operation(lambda: self.model.distribute(self.selected), message='Generated an evenly spaced draft; these are not original MI3 character timestamps.')
 
     def add(self):
+        if self.auto_text.get() and (not self.commit_line(automatic=True)):
+            return
         index = self.model.add(round(max(0, self.owner.position() - self.owner.lyric_offset), 3))
         self.refresh(index)
+        if self.auto.get():
+            self.apply_preview()
 
     def delete(self):
         self.operation(lambda: self.model.delete([int(i) for i in self.tree.selection()]))
@@ -370,21 +499,26 @@ class TimelineEditor:
         if self.owner.cues_revision != self.revision:
             self.status.set('Lyrics were replaced in another window. Open a new timeline to apply edits; you can still save this draft.')
             return
-        self.owner.set_cues(deepcopy(self.model.cues), 'Timeline edits')
+        self.owner.set_cues(sorted(deepcopy(self.model.cues), key=lambda cue: cue.start), 'Timeline edits')
         self.revision = self.owner.cues_revision
         self.status.set('Applied to preview and subsequent exports; the source MI3 is unchanged.')
 
     def save(self):
-        path = filedialog.asksaveasfilename(parent=self.window, defaultextension='.json', filetypes=[('Full line/character timing JSON', '*.json'), ('Full timing CSV', '*.csv'), ('Line start times only LRC', '*.lrc')])
+        if self.auto_text.get() and (not self.commit_line(automatic=True)):
+            return
+        from subtitle_formats import EXPORT_TYPES
+        path = filedialog.asksaveasfilename(parent=self.window, defaultextension='.json', filetypes=EXPORT_TYPES)
         if path:
             try:
+                lyrics.protect_source(path, getattr(getattr(self.owner, 'app', None), 'song', None))
                 lyrics.save_cues(path, self.model.cues, self.owner.filter_numeric.get())
                 self.status.set(('Saved with filtering: ' if self.owner.filter_numeric.get() else 'Saved with original text: ') + path + ('; LRC retains line highlight starts only. Use JSON/CSV for character start/end times.' if Path(path).suffix.lower() == '.lrc' else ''))
             except Exception as ex:
                 self.status.set(str(ex))
 
     def load(self):
-        path = filedialog.askopenfilename(parent=self.window, filetypes=[('Lyrics / timeline', '*.json *.csv *.lrc *.ass *.ssa')])
+        from subtitle_formats import IMPORT_PATTERN
+        path = filedialog.askopenfilename(parent=self.window, filetypes=[('Lyrics / timeline', IMPORT_PATTERN)])
         if path:
             try:
                 cues = lyrics.load(path)
@@ -541,6 +675,11 @@ class TimelineEditor:
 
     def close(self):
         if not self.closed:
+            if self.auto_text.get():
+                self.commit_line(automatic=True)
             self.closed = True
+            if self.draft_job:
+                self.window.after_cancel(self.draft_job)
+                self.draft_job = None
             self.window.after_cancel(self.after)
             self.window.destroy()

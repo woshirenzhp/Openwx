@@ -33,6 +33,13 @@ class Style:
     bottom: int = 50
     page_lines: int = 2
     immediate_line_change: bool = False
+    timing_enabled: bool = False
+    advance_ms: int = 4000
+    hold_ms: int = 2000
+    fade_in_ms: int = 200
+    fade_out_ms: int = 200
+    fill_early: bool = True
+    max_advance_ms: int = 6000
 
 class Renderer:
 
@@ -41,6 +48,37 @@ class Renderer:
         self.glyphs = {}
         self.page_key = None
         self.pages = []
+        self.display_key = None
+        self.display_rows = []
+
+    @staticmethod
+    def wrap_rows(cues, font, width, style):
+        rows = []
+        margin = max(20, style.stroke_width * 3)
+        for cue in sorted(cues, key=lambda c: c.start):
+            line, indices = ('', [])
+            for index, char in enumerate(cue.text):
+                if char == '\n' or (line and font.getlength(line + char) > width - 2 * margin):
+                    if indices:
+                        rows.append((cue, line, indices))
+                    line, indices = ('', [])
+                    if char == '\n':
+                        continue
+                line += char
+                indices.append(index)
+            if indices:
+                rows.append((cue, line, indices))
+        return rows
+
+    def timed_rows_at(self, cues, position, font, font_key, width, height, style):
+        from lyric_layout import build_display_rows
+        capacity = max(1, min(style.page_lines, max(1, (height - style.bottom) // math.ceil(style.size * 1.45))))
+        signature = tuple(((c.start, c.end, c.sing_start, c.text, tuple((tuple(s) for s in c.spans))) for c in cues))
+        key = (signature, font_key, width, capacity, style.stroke_width, style.immediate_line_change, style.advance_ms, style.hold_ms, style.fade_in_ms, style.fade_out_ms, style.fill_early, style.max_advance_ms)
+        if key != self.display_key:
+            self.display_rows = build_display_rows(self.wrap_rows(cues, font, width, style), capacity, style, self.row_complete)
+            self.display_key = key
+        return ([(entry.row, entry.slot, entry.opacity(position)) for entry in self.display_rows if entry.opacity(position) > 0], capacity)
 
     @staticmethod
     def row_complete(cue, indices):
@@ -142,11 +180,22 @@ class Renderer:
         if key not in self.fonts:
             self.fonts[key] = ImageFont.truetype(key[0], key[1]) if key[0] else ImageFont.load_default(size=style.size)
         font = self.fonts[key]
-        lines = self.page_at(cues, position, font, key, width, height, style)
-        draw = ImageDraw.Draw(canvas)
         line_height = math.ceil(style.size * 1.45)
-        y = height - style.bottom - len(lines) * line_height
-        for cue, line, indices in lines:
+        if style.timing_enabled:
+            layout, count = self.timed_rows_at(cues, position, font, key, width, height, style)
+        else:
+            lines = self.page_at(cues, position, font, key, width, height, style)
+            count = len(lines)
+            layout = [(row, slot, 1.0) for slot, row in enumerate(lines)]
+        for (cue, line, indices), slot, opacity in layout:
+            y = height - style.bottom - count * line_height + slot * line_height
+            target = canvas
+            text_y = y
+            if opacity < 1:
+                padding = style.size + style.stroke_width
+                target = Image.new('RGBA', (width, line_height + 2 * padding))
+                text_y = padding
+            draw = ImageDraw.Draw(target)
             x = (width - font.getlength(line)) / 2
             for index, char in zip(indices, line):
                 progress = float(not cue.spans and cue.sing_start is not None and (position >= cue.sing_start))
@@ -156,11 +205,17 @@ class Renderer:
                         progress = min(1.0, max(0.0, fraction * (right - left) - (index - left)))
                         break
                 if 0 < progress < 1:
-                    self.sweep_glyph(canvas, font, key, char, x, y, progress, style)
+                    self.sweep_glyph(target, font, key, char, x, text_y, progress, style)
                 else:
-                    draw.text((round(x), round(y)), char, font=font, fill=style.highlight if progress else style.color, stroke_width=style.stroke_width, stroke_fill=style.stroke)
+                    draw.text((round(x), round(text_y)), char, font=font, fill=style.highlight if progress else style.color, stroke_width=style.stroke_width, stroke_fill=style.stroke)
                 x += font.getlength(char)
-            y += line_height
+            if target is not canvas:
+                target.putalpha(target.getchannel('A').point([round(v * opacity) for v in range(256)]))
+                destination = (0, round(y - padding))
+                if canvas.mode == 'RGBA':
+                    canvas.alpha_composite(target, dest=destination)
+                else:
+                    canvas.paste(target, destination, target)
         return canvas
 
 class Background:
@@ -228,7 +283,7 @@ def input_audio(path):
     chunks = []
     with av.open(str(path)) as container:
         if not container.streams.audio:
-            raise ValueError('The input video has no audio stream; select No audio or Current SD3 mix')
+            raise ValueError('The input video has no audio stream; choose no audio or the audio mix')
         stream = container.streams.audio[0]
         origin = float((container.streams.video[0].start_time or 0) * container.streams.video[0].time_base)
         resampler = av.AudioResampler(format='fltp', layout='stereo', rate=44100)
@@ -282,10 +337,10 @@ def export_video(path, *, source='', green=False, cues=(), style=None, duration=
         elif audio == 'sd3':
             from engine import selected_tracks
             if song is None or not song.pcm or variant is None or (settings is None):
-                raise ValueError('Load the matching SD3 and apply playback settings first')
+                raise ValueError('Load and apply the audio playback settings first')
             tracks = selected_tracks(song, variant, settings.mode)
             if not tracks or any((t >= len(song.pcm) for t in tracks)):
-                raise ValueError('The current playback mode has no SD3 audio to export')
+                raise ValueError('The current playback mode has no audio to export')
         elif audio != 'none':
             raise ValueError('Unknown export audio source')
         with av.open(str(temporary), 'w', format='mov' if alpha else 'mp4') as output:

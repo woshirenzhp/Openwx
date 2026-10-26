@@ -23,15 +23,39 @@ class Preview:
         self.window = tk.Toplevel(owner.app.root)
         self.window.title('Green-screen lyrics - F11 fullscreen / Esc exit fullscreen' if green else 'Video and lyrics - F11 fullscreen / Esc exit fullscreen')
         self.window.geometry('960x540')
+        self.controls = ttk.Frame(self.window, padding=5)
+        self.edit_button = ttk.Button(self.controls, text='Edit lyrics... F2', command=self.open_editor)
+        self.edit_button.pack(side='left')
+        ttk.Button(self.controls, text='Play', command=owner.play).pack(side='left', padx=4)
+        ttk.Button(self.controls, text='Pause', command=owner.pause).pack(side='left')
+        self.clock = ttk.Label(self.controls)
+        self.clock.pack(side='right')
+        if not green:
+            self.controls.pack(side='bottom', fill='x')
         self.canvas = tk.Canvas(self.window, background='#00ff00' if green else '#000000', highlightthickness=0)
         self.canvas.pack(fill='both', expand=True)
         self.window.bind('<F11>', lambda e: self.window.attributes('-fullscreen', not self.window.attributes('-fullscreen')))
         self.window.bind('<Escape>', lambda e: self.window.attributes('-fullscreen', False))
+        self.window.bind('<F2>', lambda e: self.open_editor())
+        self.window.bind('<F10>', lambda e: self.toggle_controls())
+        self.menu = tk.Menu(self.window, tearoff=False)
+        self.menu.add_command(label='Edit lyrics... F2', command=self.open_editor)
+        self.menu.add_command(label='Show/hide controls F10', command=self.toggle_controls)
+        self.canvas.bind('<Button-3>', lambda e: self.menu.tk_popup(e.x_root, e.y_root))
         self.window.protocol('WM_DELETE_WINDOW', self.close)
         self.worker = threading.Thread(target=self.run, daemon=True, name='Video preview')
         self.worker.start()
         self.key = None
         self.tick()
+
+    def open_editor(self):
+        return self.owner.open_timeline(live=True)
+
+    def toggle_controls(self):
+        if self.controls.winfo_manager():
+            self.controls.pack_forget()
+        else:
+            self.controls.pack(side='bottom', fill='x', before=self.canvas)
 
     @staticmethod
     def latest(target, value):
@@ -69,6 +93,7 @@ class Preview:
             return
         owner = self.owner
         position = owner.position()
+        self.clock.configure(text=f'{position:.3f} s')
         size = owner.size()
         path = '' if self.green else owner.source.get()
         key = (owner.generation, path, round(position * 30), size, max(1, self.canvas.winfo_width()), max(1, self.canvas.winfo_height()))
@@ -88,11 +113,12 @@ class Preview:
                     self.canvas.create_image(self.canvas.winfo_width() // 2, self.canvas.winfo_height() // 2, image=self.photo, anchor='center')
         except queue.Empty:
             pass
-        self.window.after(33, self.tick)
+        self.after = self.window.after(33, self.tick)
 
     def close(self):
         if not self.closed:
             self.closed = True
+            self.window.after_cancel(self.after)
             self.latest(self.jobs, None)
             self.window.destroy()
             self.worker.join(timeout=1)
@@ -122,6 +148,9 @@ class Presentation:
         self.bottom = tk.StringVar(root, value='50')
         self.page_lines = tk.StringVar(root, value='2')
         self.immediate_line_change = tk.BooleanVar(root, value=False)
+        self.timing_enabled = tk.BooleanVar(root, value=False)
+        self.fill_early = tk.BooleanVar(root, value=True)
+        self.timing_vars = {name: tk.StringVar(root, value=str(getattr(self.style, name))) for name in ('advance_ms', 'hold_ms', 'fade_in_ms', 'fade_out_ms', 'max_advance_ms')}
         self.colors = {name: tk.StringVar(root, value=getattr(self.style, name)) for name in ('color', 'highlight', 'stroke', 'background')}
         self.lyric_ms = tk.StringVar(root, value='0')
         self.video_ms = tk.StringVar(root, value='0')
@@ -197,12 +226,13 @@ class Presentation:
         ttk.Button(frame, text='Choose...', command=self.choose_source).grid(row=0, column=2)
         row = ttk.Frame(frame)
         row.grid(row=1, column=0, columnspan=3, sticky='ew', pady=10)
-        for label, command in [('Import lyrics / timing', self.load_lyrics), ('Load lyrics from MI3', self.load_mi3), ('Text / timestamps', self.edit), ('Character timeline...', self.open_timeline), ('Export MI3 timing', self.template)]:
-            ttk.Button(row, text=label, command=command).pack(side='left', padx=3)
-        ttk.Checkbutton(row, text='Filter [4-digit codes]', variable=self.filter_numeric, command=self.filter_changed).pack(side='left', padx=5)
+        for index, (label, command) in enumerate([('Import lyrics / timing', self.load_lyrics), ('Load lyrics from MI3', self.load_mi3), ('Text / timestamps', self.edit), ('Character timeline...', self.open_timeline), ('Export MI3 timing', self.template), ('Export lyrics / subtitles...', self.save_lyrics)]):
+            ttk.Button(row, text=label, command=command).grid(row=index // 3, column=index % 3, sticky='ew', padx=3, pady=2)
+        ttk.Checkbutton(row, text='Filter [4-digit codes]', variable=self.filter_numeric, command=self.filter_changed).grid(row=2, column=0, columnspan=3, sticky='w', padx=5)
         ttk.Label(frame, text='Font file').grid(row=2, column=0, sticky='w')
         ttk.Entry(frame, textvariable=self.font).grid(row=2, column=1, sticky='ew', padx=6)
         ttk.Button(frame, text='Choose font...', command=self.choose_font).grid(row=2, column=2)
+        ttk.Button(frame, text='Visibility timing...', command=self.open_timing_style).grid(row=2, column=3, padx=(8, 0))
         row = ttk.Frame(frame)
         row.grid(row=3, column=0, columnspan=3, sticky='w', pady=8)
         for title, variable, low, high in [('Font size (px)', self.font_size, 8, 200), ('Stroke (px)', self.stroke_width, 0, 12), ('Bottom margin (px)', self.bottom, 0, 500), ('Lines per screen', self.page_lines, 1, 4)]:
@@ -256,7 +286,7 @@ class Presentation:
         ttk.Label(row, text='Transparent MOV exports lyrics only; background alpha is 0').pack(side='left', padx=10)
         row = ttk.Frame(output)
         row.pack(fill='x', pady=8)
-        for label, variable, values in [('Resolution', self.resolution, ('640x360', '1280x720', '1920x1080')), ('Frame rate', self.fps, ('24', '25', '30')), ('Audio', self.audio, ('No audio', 'Input video audio', 'Current SD3 mix'))]:
+        for label, variable, values in [('Resolution', self.resolution, ('640x360', '1280x720', '1920x1080')), ('Frame rate', self.fps, ('24', '25', '30')), ('Audio', self.audio, ('No audio', 'Input video audio', 'Current audio mix'))]:
             ttk.Label(row, text=label).pack(side='left', padx=4)
             ttk.Combobox(row, textvariable=variable, values=values, state='readonly', width=14 if label == 'Audio' else 11).pack(side='left')
         ttk.Label(row, text='Duration (s)').pack(side='left', padx=(12, 4))
@@ -296,7 +326,11 @@ class Presentation:
 
     def apply(self):
         try:
-            style = Style(font=self.font.get(), size=int(self.font_size.get()), stroke_width=int(self.stroke_width.get()), bottom=int(self.bottom.get()), page_lines=int(self.page_lines.get()), immediate_line_change=self.immediate_line_change.get(), **{key: value.get() for key, value in self.colors.items()})
+            style = Style(font=self.font.get(), size=int(self.font_size.get()), stroke_width=int(self.stroke_width.get()), bottom=int(self.bottom.get()), page_lines=int(self.page_lines.get()), immediate_line_change=self.immediate_line_change.get(), timing_enabled=self.timing_enabled.get(), fill_early=self.fill_early.get(), **{name: int(value.get()) for name, value in self.timing_vars.items()}, **{key: value.get() for key, value in self.colors.items()})
+            if any((not 0 <= getattr(style, name) <= 60000 for name in self.timing_vars)):
+                raise ValueError('Visibility timing values must be integers from 0 to 60000 ms')
+            if style.timing_enabled and style.fill_early and (style.max_advance_ms < style.advance_ms):
+                raise ValueError('Maximum lead must not be less than the normal lead time')
             if not 8 <= style.size <= 200 or not 0 <= style.stroke_width <= 12 or (not 0 <= style.bottom <= 500) or (not 1 <= style.page_lines <= 4):
                 raise ValueError('Font size: 8-200; stroke: 0-12; bottom margin: 0-500; lines per screen: 1-4')
             for value in self.colors.values():
@@ -312,6 +346,10 @@ class Presentation:
         except Exception as ex:
             messagebox.showerror('Invalid settings', str(ex), parent=self.window)
             return False
+
+    def open_timing_style(self):
+        from timing_style import TimingStyleDialog
+        TimingStyleDialog(self)
 
     def choose_source(self):
         path = filedialog.askopenfilename(parent=self.window, filetypes=[('Video or image', '*.mp4 *.mkv *.mov *.avi *.ts *.webm *.png *.jpg *.jpeg *.bmp *.webp'), ('All files', '*.*')])
@@ -333,9 +371,21 @@ class Presentation:
         self.generation += 1
         self.status.set('Filter enabled: preview and exports hide [0000]-[9999]; the editor keeps the original text.' if self.filter_numeric.get() else 'Filter disabled: preview and exports retain the original lyric text.')
 
-    def open_timeline(self):
+    def open_timeline(self, live=False):
         from timeline import TimelineEditor
-        self.editors.append(TimelineEditor(self))
+        if live:
+            existing = next((editor for editor in self.editors if editor.live and (not editor.closed) and (editor.revision == self.cues_revision)), None)
+            if existing:
+                existing.window.deiconify()
+                existing.window.lift()
+                existing.window.focus_set()
+                return existing
+        editor = TimelineEditor(self, live=live)
+        self.editors.append(editor)
+        if live:
+            editor.select_current()
+            editor.window.focus_set()
+        return editor
 
     def set_cues(self, cues, source):
         self.cues = cues
@@ -352,13 +402,17 @@ class Presentation:
         self.local_position, self.local_start = (0, None)
         variant = song.variants[max(0, self.app.variant_box.current())]
         self.duration.set(f'{max([variant.duration] + [len(p) / 44100 for p in song.pcm]):.3f}')
-        self.audio.set('Current SD3 mix' if song.pcm else 'No audio')
+        if self.app.ready and getattr(self.app.engine, 'song', None) is song:
+            self.duration.set(f'{self.app.engine.duration:.3f}')
+        self.audio.set('Current audio mix' if song.pcm else 'No audio')
         try:
-            if song.mi3.suffix.lower() == '.mi3':
-                self.set_cues(lyrics.mi3_cues(song.mi3), 'MI3 default character template (estimated; editable)')
+            if song.mi3 and song.mi3.suffix.lower() == '.mi3':
+                self.set_cues(lyrics.mi3_cues(song.mi3), 'MI3 firmware-clock character template (estimated; editable)')
+            elif getattr(song, 'lyric_cues', []):
+                self.set_cues(song.lyric_cues, 'MIDI / XF: ' + song.lyric_source)
             else:
-                for suffix in ('.lrc', '.ass'):
-                    sidecar = song.mi3.with_suffix(suffix)
+                for suffix in ('.lrc', '.srt', '.vtt', '.ass', '.ssa', '.ttml', '.dfxp', '.scc', '.xf'):
+                    sidecar = (song.mi3 or song.sd3).with_suffix(suffix)
                     if sidecar.exists():
                         self.set_cues(lyrics.load(sidecar), sidecar.name)
                         break
@@ -366,15 +420,27 @@ class Presentation:
             self.status.set(f'MI3 lyrics unavailable: {ex}; you can import external LRC/ASS lyrics.')
 
     def load_lyrics(self):
-        path = filedialog.askopenfilename(parent=self.window, filetypes=[('Timed lyrics', '*.lrc *.ass *.ssa *.json *.csv'), ('All files', '*.*')])
+        from subtitle_formats import IMPORT_PATTERN
+        path = filedialog.askopenfilename(parent=self.window, filetypes=[('Timed lyrics', IMPORT_PATTERN), ('All files', '*.*')])
         if path:
             try:
                 self.set_cues(lyrics.load(path), Path(path).name)
             except Exception as ex:
                 messagebox.showerror('Lyric load failed', str(ex), parent=self.window)
 
+    def save_lyrics(self):
+        from subtitle_formats import EXPORT_TYPES
+        path = filedialog.asksaveasfilename(parent=self.window, defaultextension='.json', filetypes=EXPORT_TYPES)
+        if path:
+            try:
+                lyrics.protect_source(path, self.app.song)
+                lyrics.save_cues(path, self.cues, self.filter_numeric.get())
+                self.status.set('Lyrics exported: ' + path + '; target formats may quantize or simplify word timing; save JSON/CSV for a complete editable timeline.')
+            except Exception as ex:
+                messagebox.showerror('Lyric export failed', str(ex), parent=self.window)
+
     def mi3_selection(self):
-        path = str(self.app.song.mi3) if self.app.song and self.app.song.mi3.suffix.lower() == '.mi3' else ''
+        path = str(self.app.song.mi3) if self.app.song and self.app.song.mi3 and (self.app.song.mi3.suffix.lower() == '.mi3') else ''
         if not path:
             path = filedialog.askopenfilename(parent=self.window, filetypes=[('MI3', '*.MI3')])
         if not path:
@@ -386,7 +452,7 @@ class Presentation:
         selected = self.mi3_selection()
         if selected:
             try:
-                self.set_cues(lyrics.mi3_cues(*selected), 'MI3 default character template (estimated; editable)')
+                self.set_cues(lyrics.mi3_cues(*selected), 'MI3 firmware-clock character template (estimated; editable)')
             except Exception as ex:
                 messagebox.showerror('MI3 lyric load failed', str(ex), parent=self.window)
 
@@ -480,6 +546,8 @@ class Presentation:
         if not self.enable_export.get() or (self.export_thread and self.export_thread.is_alive()) or (not self.apply()):
             return
         try:
+            if self.app.song and (not self.app.ready):
+                raise ValueError('Apply playback settings and wait until ready before exporting')
             duration = float(self.duration.get())
             fps = int(self.fps.get())
             if not 0 < duration <= 86400:
@@ -495,7 +563,7 @@ class Presentation:
                 raise ValueError(f'For this format, use the {extension} extension')
             engine = self.app.engine
             settings = replace(engine.settings, gains=list(engine.settings.gains))
-            kwargs = dict(source=self.source.get(), green=self.green_export.get(), cues=self.output_cues(), style=replace(self.style), duration=duration, size=self.size(), fps=fps, lyric_offset=self.lyric_offset, video_offset=self.video_offset, audio={'No audio': 'none', 'Input video audio': 'video', 'Current SD3 mix': 'sd3'}[self.audio.get()], song=engine.song, variant=engine.variant, settings=settings, output_format=output_format)
+            kwargs = dict(source=self.source.get(), green=self.green_export.get(), cues=self.output_cues(), style=replace(self.style), duration=duration, size=self.size(), fps=fps, lyric_offset=self.lyric_offset, video_offset=self.video_offset, audio={'No audio': 'none', 'Input video audio': 'video', 'Current audio mix': 'sd3'}[self.audio.get()], song=engine.song, variant=engine.variant, settings=settings, output_format=output_format)
         except Exception as ex:
             messagebox.showerror('Invalid export settings', str(ex), parent=self.window)
             return

@@ -1,0 +1,11 @@
+[Script Info]
+ScriptType: v4.00
+PlayResX: 1280
+PlayResY: 720
+[V4 Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, TertiaryColour, BackColour, Bold, Italic, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, AlphaLevel, Encoding
+Style: Default,Arial,54,16777215,65535,0,0,0,0,1,2,0,2,30,30,50,0,1
+[Events]
+Format: Marked, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: Marked=0,0:00:02.00,0:00:04.00,Default,,0,0,0,,{\k100}Test {\k100}lyrics
+Dialogue: Marked=0,0:00:05.00,0:00:07.00,Default,,0,0,0,,{\k100}Second {\k100}line

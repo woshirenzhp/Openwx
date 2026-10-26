@@ -11,8 +11,8 @@ import shutil
 import sys
 import zipfile
 PROJECT = Path(__file__).resolve().parent
-PACKAGES = {'numpy': ['numpy', 'numpy.libs'], 'av': ['av', 'av.libs'], 'sounddevice': ['sounddevice.py', '_sounddevice.py', '_sounddevice_data'], 'cffi': ['cffi', '_cffi_backend.cp312-win_amd64.pyd'], 'pycparser': ['pycparser'], 'mido': ['mido'], 'packaging': ['packaging'], 'pillow': ['PIL']}
-APP_FILES = ['app.py', 'bootstrap.py', 'engine.py', 'formats.py', 'midi_out.py', 'fonts/UDRGMZtk.ttf', 'song.py', 'smf.py', 'lyrics.py', 'media.py', 'presentation.py', 'timeline.py', 'requirements.txt', 'README.md', 'start_player.cmd', 'start_sample.cmd', 'check_dependencies.py', 'build_portable.py', 'QUICK_START.md', 'localization_manifest.json']
+PACKAGES = {'numpy': ['numpy', 'numpy.libs'], 'av': ['av', 'av.libs'], 'sounddevice': ['sounddevice.py', '_sounddevice.py', '_sounddevice_data'], 'cffi': ['cffi', '_cffi_backend.cp312-win_amd64.pyd'], 'pycparser': ['pycparser'], 'mido': ['mido'], 'packaging': ['packaging'], 'pillow': ['PIL'], 'pycaption': ['pycaption'], 'beautifulsoup4': ['bs4'], 'lxml': ['lxml'], 'cssutils': ['cssutils'], 'soupsieve': ['soupsieve'], 'typing_extensions': ['typing_extensions.py'], 'more_itertools': ['more_itertools'], 'encutils': ['encutils'], 'chardet': ['chardet']}
+APP_FILES = ['app.py', 'projects.py', 'project_ui.py', 'bootstrap.py', 'engine.py', 'formats.py', 'midi_out.py', 'fonts/UDRGMZtk.ttf', 'song.py', 'smf.py', 'xf_lyrics.py', 'scc_lyrics.py', 'subtitle_formats.py', 'lyrics.py', 'lyric_clock.py', 'lyric_layout.py', 'timing_style.py', 'media.py', 'presentation.py', 'timeline.py', 'requirements.txt', 'README.md', 'start_player.cmd', 'start_sample.cmd', 'SUBTITLE_FORMATS.md', 'PROJECTS.md', 'subtitle_samples/demo.xf', 'subtitle_samples/demo.srt', 'subtitle_samples/demo.vtt', 'subtitle_samples/demo.ass', 'subtitle_samples/demo.ssa', 'subtitle_samples/demo.ttml', 'subtitle_samples/demo.dfxp', 'subtitle_samples/demo.scc', 'check_dependencies.py', 'build_portable.py', 'QUICK_START.md', 'localization_manifest.json']
 
 def copy(source, dest):
     if source.is_dir():
@@ -24,7 +24,7 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument('--python-root', type=Path, default=Path(sys.base_prefix))
     ap.add_argument('--dependency-dir', type=Path, default=PROJECT.parent / 'analysis_tools')
-    ap.add_argument('--zip', type=Path, default=PROJECT / 'MI3_SD3_Sync_Player_Portable_Openjs-wx_0.7_EN.zip')
+    ap.add_argument('--zip', type=Path, default=PROJECT / 'MI3_SD3_Sync_Player_Portable_Openjs-wx_0.15_EN.zip')
     ap.add_argument('--repack', action='store_true', help='Package an existing runtime; replace the selected ZIP')
     args = ap.parse_args()
     if sys.platform != 'win32' or sys.version_info[:2] != (3, 12) or sys.maxsize <= 2 ** 32:
@@ -65,7 +65,7 @@ def main():
             copy(metadata, site / metadata.name)
         versions[package] = version
     (runtime / 'python312._pth').write_text('.\nDLLs\nLib\nLib/site-packages\n..\n', encoding='ascii')
-    manifest = {'application_version': 'Openjs-wx 0.7 English', 'python': sys.version, 'platform': 'Windows x64', 'packages': versions, 'licenses': 'runtime/LICENSE.txt and runtime/Lib/site-packages/*dist-info/licenses', 'files': {}}
+    manifest = {'application_version': 'Openjs-wx 0.15 English', 'python': sys.version, 'platform': 'Windows x64', 'packages': versions, 'licenses': 'runtime/LICENSE.txt and runtime/Lib/site-packages/*dist-info/licenses', 'files': {}}
     for path in sorted(runtime.rglob('*')):
         if path.is_file() and '__pycache__' not in path.parts and (path.suffix != '.pyc'):
             manifest['files'][path.relative_to(PROJECT).as_posix()] = hashlib.sha256(path.read_bytes()).hexdigest()

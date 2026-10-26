@@ -1,0 +1,9 @@
+{
+  "edition": "0.7 English",
+  "regression_tests": 39,
+  "translated_constants": 371,
+  "zip_crc": "passed",
+  "isolated_gui": "passed",
+  "native_device_names": "preserved",
+  "lyric_language": "preserved"
+}

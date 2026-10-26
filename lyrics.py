@@ -92,7 +92,7 @@ def ass_time(text):
 def ass(text):
     fields = None
     in_events = False
-    cues = []
+    events = []
     for line in text.splitlines():
         if line.startswith('['):
             in_events = line.strip().lower() == '[events]'
@@ -109,28 +109,62 @@ def ass(text):
             raise ValueError('Incomplete ASS Dialogue fields')
         row = dict(zip(fields, values))
         start, end = (ass_time(row['start']), ass_time(row['end']))
-        body, spans, clock, chars = ('', [], 0.0, 0)
+        body, spans, clock = ('', [], 0.0)
         pending = None
         for part in re.split('(\\{[^}]*\\})', row['text']):
             if part.startswith('{'):
-                match = re.search('\\\\[kK](?:f|o)?(\\d+)', part)
-                if match:
-                    pending = int(match[1]) / 100
+                if re.search('\\\\r(?:[^\\\\}]*)', part):
+                    pending = None
+                for tag in re.finditer('\\\\(kt|kf|ko|k|K)(\\d+)', part):
+                    value = int(tag[2]) / 100
+                    if tag[1] == 'kt':
+                        clock, pending = (value, None)
+                    else:
+                        pending = (clock, clock + value)
+                        clock += value
                 continue
-            part = part.replace('\\N', '\n').replace('\\n', '\n').replace('\\h', ' ')
+            part = re.sub('\\\\([Nnh\\\\])', lambda m: {'N': '\n', 'n': '\n', 'h': ' ', '\\': '\\'}[m[1]], part)
+            left = len(body)
             body += part
-            if pending is not None:
-                spans.append((clock, clock + pending, chars, chars + len(part)))
-                clock += pending
-                pending = None
-            chars += len(part)
-        if end > start:
-            cues.append(Cue(start, end, body, spans))
+            if pending is not None and part:
+                a, b = pending
+                if spans and spans[-1][:2] == (a, b) and (spans[-1][3] == left):
+                    spans[-1] = (a, b, spans[-1][2], len(body))
+                else:
+                    spans.append((a, b, left, len(body)))
+        if end > start and body:
+            position = re.search('\\\\pos\\(\\s*([+-]?[\\d.]+)\\s*,\\s*([+-]?[\\d.]+)\\s*\\)', row['text'])
+            alignment = re.search('\\\\an([1-9])', row['text'])
+            key = None
+            if position and spans and ('\n' not in body) and (not re.search('\\\\(?:move|t|p\\d)\\b', row['text'])):
+                x, y = map(float, position.groups())
+                key = (start, end, round(y, 3), alignment[1] if alignment else None, *(row.get(k, '') for k in ('layer', 'marked', 'style', 'name', 'effect', 'marginl', 'marginr', 'marginv')))
+            events.append((key, float(position[1]) if position else 0, Cue(start, end, body, spans)))
+    groups = {}
+    for index, (key, x, cue) in enumerate(events):
+        if key is not None:
+            groups.setdefault(key, []).append(index)
+    merged, skipped = ({}, set())
+    for indices in groups.values():
+        if len(indices) < 2 or len({events[i][1] for i in indices}) != len(indices):
+            continue
+        body, spans = ('', [])
+        for i in sorted(indices, key=lambda i: events[i][1]):
+            cue = events[i][2]
+            spans.extend(((a, b, left + len(body), right + len(body)) for a, b, left, right in cue.spans))
+            body += cue.text
+        cue = events[indices[0]][2]
+        merged[indices[0]] = Cue(cue.start, cue.end, body, spans, timing_source='ass-positioned-karaoke')
+        skipped.update(indices[1:])
+    cues = [merged.get(i, event[2]) for i, event in enumerate(events) if i not in skipped]
     if not cues:
         raise ValueError('No valid ASS Dialogue events found')
     return sorted(cues, key=lambda cue: cue.start)
 
 def load(path):
+    from subtitle_formats import SUFFIXES, load as load_subtitle
+    if Path(path).suffix.lower() in SUFFIXES:
+        return load_subtitle(path)
     if Path(path).suffix.lower() == '.csv':
         data = {'lines': list(csv.DictReader(io.StringIO(read_text(path))))}
         cues = [Cue(float(row['display_seconds']), float(row['clear_seconds']), row['text'], spans=json.loads(row.get('spans_json') or '[]'), sing_start=float(row['sing_seconds']), timing_source=row.get('timing_source', '')) for row in data['lines']]
@@ -218,6 +252,7 @@ def character_template(data):
     exact recreation of the device's pixel geometry or character timestamps.
     """
     import unicodedata
+    from lyric_clock import SweepClock, centiseconds
     font = None
     try:
         from PIL import ImageFont
@@ -226,28 +261,19 @@ def character_template(data):
         pass
     cues = []
     for row_index, row in enumerate(data['lines']):
-        start, begin, end = (row['display_seconds'], row['sing_seconds'], row['clear_seconds'])
+        start_cs = centiseconds(row, 'display')
+        begin_cs = centiseconds(row, 'sing')
+        end_cs = centiseconds(row, 'clear')
+        start, begin, end = (start_cs / 100, begin_cs / 100, end_cs / 100)
         lane = row['mode']
-        following = [r['sing_seconds'] for r in data['lines'][row_index + 1:] if r['mode'] == lane and r['sing_seconds'] > begin]
-        limit = min([end] + following[:1])
-        events = sorted((e for e in data['color_changes'] if e['command'] == lane), key=lambda e: e['time_cs'])
-        rate, at, distance, segments = (0, begin * 100, 0, [])
-
-        def segment(until):
-            nonlocal at, distance
-            amount = max(0, math.floor(rate * until / 100 + 1e-08) - math.floor(rate * at / 100 + 1e-08))
-            if amount:
-                segments.append((at / 100, until / 100, distance, distance + amount))
-                distance += amount
-            at = until
-        for event in events:
-            clock = event['time_cs']
-            if clock <= begin * 100 + 1e-08:
-                rate = event['speed_raw'] * event['multiplier'] // 100
-            elif clock < limit * 100:
-                segment(clock)
-                rate = event['speed_raw'] * event['multiplier'] // 100
-        segment(limit * 100)
+        following = [centiseconds(r, 'sing') for r in data['lines'][row_index + 1:] if r['mode'] == lane and centiseconds(r, 'sing') > begin_cs]
+        limit_cs = min([end_cs] + following)
+        try:
+            clock = SweepClock(data['color_changes'], begin_cs, limit_cs, lane)
+        except ValueError as ex:
+            raise ValueError('Invalid lyric sweep data or clock outside the verified range: ' + str(ex)) from ex
+        distance = clock.distance
+        limit = limit_cs / 100
         text = row['text']
         widths = []
         for char in text:
@@ -257,23 +283,22 @@ def character_template(data):
             widths[match.start():match.end()] = [48 / 6] * 6
         total = sum(widths)
         spans, cursor = ([], 0)
-        source = 'estimated-speed-font-v1' if distance else 'estimated-width-fallback-v1'
-
-        def inverse(value):
-            if not segments:
-                return begin + (limit - begin) * value
-            target = value * distance
-            for a, b, left, right in segments:
-                if target <= right:
-                    return a + (b - a) * max(0, target - left) / (right - left)
-            return segments[-1][1]
+        source = ('estimated-speed-font-v2-cs' if font else 'estimated-speed-width-v2-cs') if distance else 'estimated-width-fallback-v2'
+        last_end = begin_cs
         if total and limit > begin:
             for index, width in enumerate(widths):
                 if not width:
                     continue
-                a = inverse(cursor / total)
-                cursor += width
-                b = inverse(cursor / total)
+                if distance:
+                    a_cs = max(last_end, clock.last_before_motion(cursor / total * distance))
+                    cursor += width
+                    b_cs = max(a_cs, clock.first_reached(cursor / total * distance))
+                    last_end = b_cs
+                    a, b = (a_cs / 100, b_cs / 100)
+                else:
+                    a = begin + (limit - begin) * cursor / total
+                    cursor += width
+                    b = begin + (limit - begin) * cursor / total
                 spans.append((round(a - start, 6), round(b - start, 6), index, index + 1))
         cues.append(Cue(start, end, text, spans, begin, source))
     return cues
@@ -283,6 +308,9 @@ def mi3_cues(path, resource=0):
 
 def save_cues(path, cues, filter_numeric=False):
     """Save edited line/character timing; JSON/CSV retain every span at millisecond precision."""
+    from subtitle_formats import SUFFIXES, save as save_subtitle
+    if Path(path).suffix.lower() in SUFFIXES:
+        return save_subtitle(path, output_cues(cues, filter_numeric))
     rows = []
     for index, cue in enumerate(output_cues(cues, filter_numeric)):
         cue = Cue(cue.start, cue.end, cue.text, list(cue.spans), cue.sing_start, cue.timing_source)
@@ -304,6 +332,12 @@ def save_cues(path, cues, filter_numeric=False):
     else:
         raise ValueError('Select a JSON, CSV or LRC file')
 
+def protect_source(path, song):
+    if song:
+        destination = Path(path).resolve()
+        if any((source and destination == Path(source).resolve() for source in (song.mi3, song.sd3))):
+            raise ValueError('Lyric export cannot overwrite the current music or audio source; choose a new filename')
+
 def export_template(path, folder, resource=0, filter_numeric=False):
     folder = Path(folder)
     folder.mkdir(parents=True, exist_ok=True)
@@ -314,6 +348,7 @@ def export_template(path, folder, resource=0, filter_numeric=False):
         row['spans'] = cue.spans
         row['timing_source'] = cue.timing_source
     data['notes'].append('Default character times are estimated from the sweep-speed curve normalized to substitute font widths; they are not original device timestamps.')
+    data['character_timing'] = {'algorithm': 'firmware-clock-font-v2', 'native_clock_hz': 100, 'span_time_unit': 'seconds relative to display_seconds', 'estimated': True, 'font_metrics': 'substitute'}
     data['filter_numeric_markers'] = bool(filter_numeric)
     if filter_numeric:
         for row in data['lines']:

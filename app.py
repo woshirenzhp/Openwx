@@ -20,7 +20,7 @@ except Exception as ex:
     messagebox.showerror('Missing player dependencies', f'{ex}\n\nExtract the entire portable ZIP and run start_player.cmd.\nFor source development, install the packages in requirements.txt.')
     root.destroy()
     raise SystemExit(1)
-MODES = {'Auto: MDT-linked audio': 'auto', 'Manual: all audio + MIDI': 'mix', 'Audio only': 'audio', 'MIDI only': 'midi'}
+MODES = {'Auto: native links / full external audio': 'auto', 'Manual: all audio + MIDI': 'mix', 'Audio only': 'audio', 'MIDI only': 'midi'}
 
 def stamp(seconds):
     minutes, rest = divmod(max(0, seconds), 60)
@@ -42,7 +42,7 @@ class App:
         self.route_maps = {}
         self.route_index = None
         self.presentation = None
-        root.title('MI3 + SD3 Sync Player - Openjs-wx 0.7 English')
+        root.title('MI3 + SD3 Sync Player · Openjs-wx 0.15 English')
         root.geometry('1080x990')
         root.minsize(900, 850)
         root.protocol('WM_DELETE_WINDOW', self.close)
@@ -53,14 +53,14 @@ class App:
         outer = ttk.Frame(root, padding=18)
         outer.pack(fill='both', expand=True)
         ttk.Label(outer, text='MI3 + SD3 Sync Player', style='Title.TLabel').pack(anchor='w')
-        ttk.Label(outer, text='MI3 / multiple SMF files - Per-track routing to four MIDI ports - Synchronized SD3 audio').pack(anchor='w', pady=(3, 12))
-        files = ttk.LabelFrame(outer, text='Song files', padding=10)
+        ttk.Label(outer, text='MI3 / multiple MIDI files · Four-port routing · SD3 / external audio sync').pack(anchor='w', pady=(3, 12))
+        files = ttk.LabelFrame(outer, text='Music and audio files (freely paired)', padding=10)
         files.pack(fill='x')
         files.columnconfigure(1, weight=1)
         self.mi3_path = tk.StringVar(value=mi3)
         self.sd3_path = tk.StringVar(value=sd3)
-        for row, (label, variable, extension) in enumerate([('MI3', self.mi3_path, '.MI3'), ('SD3', self.sd3_path, '.SD3')]):
-            ttk.Label(files, text=label, width=5).grid(row=row, column=0, sticky='w', pady=3)
+        for row, (label, variable, extension) in enumerate([('MI3 / MIDI', self.mi3_path, '.MI3'), ('SD3 / Audio', self.sd3_path, '.SD3')]):
+            ttk.Label(files, text=label, width=13).grid(row=row, column=0, sticky='w', pady=3)
             ttk.Entry(files, textvariable=variable).grid(row=row, column=1, sticky='ew', padx=6)
             ttk.Button(files, text='Browse...', command=lambda v=variable, e=extension: self.browse(v, e)).grid(row=row, column=2)
         ttk.Button(files, text='Load files', command=self.load).grid(row=0, column=3, rowspan=2, padx=(10, 0), sticky='ns')
@@ -81,8 +81,8 @@ class App:
         self.mode_box.bind('<<ComboboxSelected>>', self.settings_changed)
         self.offset_audio = tk.StringVar(value='0')
         self.offset_midi = tk.StringVar(value='0')
-        ttk.Label(settings, text='Audio offset (ms)').grid(row=1, column=2, sticky='w')
-        ttk.Spinbox(settings, from_=-10000, to=10000, increment=10, textvariable=self.offset_audio, width=10).grid(row=1, column=3, sticky='w')
+        ttk.Label(settings, text='Audio/PCM offset ms').grid(row=1, column=2, sticky='w')
+        ttk.Spinbox(settings, from_=-86400000, to=86400000, increment=1, textvariable=self.offset_audio, width=10).grid(row=1, column=3, sticky='w')
         ttk.Label(settings, text='MIDI offset (ms)').grid(row=2, column=2, sticky='w')
         ttk.Spinbox(settings, from_=-10000, to=10000, increment=10, textvariable=self.offset_midi, width=10).grid(row=2, column=3, sticky='w')
         ttk.Label(settings, text='Audio output').grid(row=2, column=0, sticky='w')
@@ -146,11 +146,31 @@ class App:
         ttk.Scale(self.mix_frame, from_=0, to=100, variable=self.master_var, command=self.change_mix).grid(row=0, column=1, sticky='ew', padx=10)
         self.mix_frame.columnconfigure(1, weight=1)
         self.track_widgets = []
-        self.status = tk.StringVar(value='Select an MI3 file. A matching SD3 in the same folder is selected automatically. Loading does not start playback.')
+        self.status = tk.StringVar(value='Select music, audio or both; audio-only and MIDI-only sessions are supported.')
         ttk.Label(outer, textvariable=self.status, wraplength=940).pack(anchor='w', pady=5)
         self.log = tk.Text(outer, height=7, font=('Consolas', 10), wrap='word', state='disabled')
         self.log.pack(fill='both', expand=True, pady=(3, 0))
         self.refresh_devices()
+        from project_ui import ProjectController
+        self.projects = ProjectController(self)
+        menu = tk.Menu(root)
+        project_menu = tk.Menu(menu, tearoff=False)
+        project_menu.add_command(label='Open project...', accelerator='Ctrl+O', command=self.projects.open)
+        project_menu.add_command(label='Save project', accelerator='Ctrl+S', command=lambda: self.projects.save(reuse=True))
+        project_menu.add_command(label='Save reference project as...', command=lambda: self.projects.save(packed=False))
+        project_menu.add_command(label='Save packed project as...', accelerator='Ctrl+Shift+S', command=lambda: self.projects.save(packed=True))
+        menu.add_cascade(label='Project', menu=project_menu)
+        root.configure(menu=menu)
+
+        def shortcut(callback):
+
+            def invoke(event):
+                callback()
+                return 'break'
+            return invoke
+        root.bind_all('<Control-o>', shortcut(self.projects.open))
+        root.bind_all('<Control-s>', shortcut(lambda: self.projects.save(reuse=True)))
+        root.bind_all('<Control-Shift-S>', shortcut(lambda: self.projects.save(packed=True)))
         root.after(80, self.poll)
 
     def write(self, text):
@@ -169,12 +189,14 @@ class App:
         self.presentation.open()
 
     def browse(self, variable, extension):
-        path = filedialog.askopenfilename(filetypes=[(extension[1:] + ' files', '*' + extension), ('All files', '*.*')])
+        types = [('MI3 / MIDI', '*.MI3 *.mi3 *.mid *.midi *.kar *.xf')] if extension == '.MI3' else [('SD3 / Audio', '*.SD3 *.sd3 *.wav *.aac *.mp3 *.flac *.ape *.alac *.m4a *.mp4')]
+        path = filedialog.askopenfilename(filetypes=types + [('All files', '*.*')])
         if path:
             variable.set(path)
             if extension == '.MI3':
                 candidate = Path(path).with_suffix('.SD3')
-                self.sd3_path.set(str(candidate) if candidate.exists() else '')
+                if candidate.exists() and (not self.sd3_path.get().strip()):
+                    self.sd3_path.set(str(candidate))
 
     def refresh_devices(self):
         old_audio = self.audio_var.get()
@@ -203,11 +225,11 @@ class App:
             self.write(f'Device enumeration failed: {ex}')
 
     def load(self):
-        if self.loading:
+        if self.loading or self.projects.busy:
             return
         path = self.mi3_path.get().strip()
-        if not path:
-            messagebox.showinfo('Select file', 'Select an MI3 file')
+        if not path and (not self.sd3_path.get().strip()):
+            messagebox.showinfo('Select file', 'Select at least one music or audio file')
             return
         self.engine.command('stop')
         self.ready = False
@@ -228,7 +250,7 @@ class App:
         threading.Thread(target=work, daemon=True, name='Song loader').start()
 
     def load_smf(self):
-        if self.loading:
+        if self.loading or self.projects.busy:
             return
         paths = filedialog.askopenfilenames(title='Select one or more SMF files (play together)', filetypes=[('Standard MIDI files', '*.mid *.midi'), ('All files', '*.*')])
         if not paths:
@@ -240,11 +262,11 @@ class App:
         self.load_generation += 1
         generation = self.load_generation
         self.status.set('Loading SMF...')
+        audio = self.sd3_path.get().strip() or None
 
         def work():
             try:
-                from smf import load_smf_song
-                song = load_smf_song(paths, lambda text: self.events.put(('progress', generation, text)))
+                song = load_song(paths, audio, lambda text: self.events.put(('progress', generation, text)))
                 self.events.put(('loaded', generation, song))
             except Exception as ex:
                 logging.exception('SMF load failed')
@@ -298,7 +320,9 @@ class App:
         self.route_index = None
         self.ensure_routes()
 
-    def on_loaded(self, song):
+    def on_loaded(self, song, apply_settings=True):
+        if apply_settings:
+            self.projects.pending_ready = None
         self.loading = False
         self.song = song
         self.route_maps = {}
@@ -310,12 +334,15 @@ class App:
             default_index = next((i for i, v in enumerate(song.variants) if not v.selected), 0)
         self.variant_box.current(default_index)
         self.ensure_routes()
-        if song.variants[default_index].label == 'SMF':
-            self.mode_var.set('MIDI only')
-            self.mi3_path.set('')
-            self.sd3_path.set('')
-        elif self.mode_var.get() == 'Audio only' and (not song.pcm):
+        if song.mi3 is None:
+            self.mode_var.set('Audio only')
+        elif song.variants[default_index].label == 'SMF':
+            self.mode_var.set(next(iter(MODES)) if song.pcm else 'MIDI only')
+            self.mi3_path.set(str(song.mi3))
+        elif song.audio_override:
             self.mode_var.set(next(iter(MODES)))
+        if not song.pcm:
+            self.mode_var.set('MIDI only')
         for widget in self.track_widgets:
             widget.destroy()
         self.track_widgets.clear()
@@ -323,18 +350,19 @@ class App:
         for index, pcm in enumerate(song.pcm):
             gain = tk.DoubleVar(value=70)
             self.gain_vars.append(gain)
-            label = ttk.Label(self.mix_frame, text=f'SD3 {index} · {len(pcm) / RATE:.2f}s')
+            label = ttk.Label(self.mix_frame, text=f'Audio {index} · {len(pcm) / RATE:.2f}s')
             label.grid(row=index + 1, column=0, sticky='w')
             slider = ttk.Scale(self.mix_frame, from_=0, to=100, variable=gain, command=self.change_mix)
             slider.grid(row=index + 1, column=1, sticky='ew', padx=10)
             self.track_widgets.extend((label, slider))
-        self.write(f'Loaded {song.mi3.name}：{len(song.variants)} music resources, {len(song.pcm)} audio tracks')
+        self.write(f'Loaded {(song.mi3 or song.sd3).name}：{len(song.variants)} music resources, {len(song.pcm)} audio tracks')
         self.write('Research build: original instrument sounds, mixing and startup offsets are approximate. Use offsets to calibrate.')
         for warning in song.warnings:
             self.write('Note: ' + warning)
         if self.presentation:
             self.presentation.on_song_loaded(song)
-        self.apply()
+        if apply_settings:
+            self.apply()
 
     def settings_changed(self, event=None):
         if self.song and (not self.loading):
@@ -347,8 +375,10 @@ class App:
             index = max(0, self.variant_box.current())
             self.ensure_routes()
             audio_offset, midi_offset = (float(self.offset_audio.get()), float(self.offset_midi.get()))
-            if not (-10000 <= audio_offset <= 10000 and -10000 <= midi_offset <= 10000):
-                raise ValueError('Offsets must be between -10000 and 10000 ms')
+            if not -86400000 <= audio_offset <= 86400000:
+                raise ValueError('Audio/PCM offset must be within +/-86400000 ms (24 hours)')
+            if not -10000 <= midi_offset <= 10000:
+                raise ValueError('MIDI offset must be within +/-10000 ms')
             settings = Settings(mode=MODES[self.mode_var.get()], audio_device=self.audio_lookup[self.audio_var.get()], midi_devices=tuple((self.midi_lookup[v.get()] for v in self.midi_vars)), midi_sources=tuple((0 if v.get() == 'Source A' else 1 for v in self.midi_source_vars)), track_routes={track: tuple(sorted(ports)) for track, ports in self.route_maps[index].items()}, audio_offset=audio_offset / 1000, midi_offset=midi_offset / 1000, master=self.master_var.get() / 100, gains=[v.get() / 100 for v in self.gain_vars])
             self.ready = False
             self.play_button.configure(state='disabled')
@@ -398,12 +428,16 @@ class App:
                 if kind == 'ready':
                     self.ready = True
                     self.play_button.configure(state='normal')
+                    restored = self.projects.on_ready()
+                    if not restored and self.presentation and self.presentation.follow.get():
+                        self.presentation.duration.set(f'{self.engine.duration:.3f}')
                 elif kind == 'error':
                     self.ready = False
                     self.play_button.configure(state='disabled')
                     messagebox.showerror('Playback failed', value)
         except queue.Empty:
             pass
+        self.projects.poll()
         position, duration, playing = self.engine.snapshot()
         self.timeline.configure(to=max(1, duration))
         if not self.dragging:
@@ -421,14 +455,17 @@ class App:
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument('--mi3', default='')
-    ap.add_argument('--sd3', default='')
+    ap.add_argument('--mi3', '--music', dest='mi3', default='')
+    ap.add_argument('--sd3', '--audio', dest='sd3', default='')
+    ap.add_argument('--project', default='')
     args = ap.parse_args()
     root = tk.Tk()
     app = App(root, args.mi3, args.sd3)
     root.report_callback_exception = lambda kind, ex, trace: (logging.error('GUI error', exc_info=(kind, ex, trace)), messagebox.showerror('Interface error', str(ex)))
     logging.info('GUI ready')
-    if args.mi3:
+    if args.project:
+        root.after(150, lambda: app.projects.open(args.project))
+    elif args.mi3 or args.sd3:
         root.after(150, app.load)
     root.mainloop()
 if __name__ == '__main__':

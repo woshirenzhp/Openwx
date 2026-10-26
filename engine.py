@@ -25,7 +25,7 @@ class Settings:
 def selected_tracks(song, variant, mode):
     if mode == 'midi':
         return []
-    if mode in ('mix', 'audio'):
+    if mode in ('mix', 'audio') or getattr(song, 'audio_override', False):
         return list(range(len(song.pcm)))
     if variant.segmented:
         raise ValueError('This MDT uses type-14 segmented audio events. Automatic scheduling is not implemented; use MIDI only or manual mixing.')
@@ -38,7 +38,7 @@ def mix_block(song, variant, tracks, frame, count, settings):
         if track >= len(song.pcm):
             continue
         audio = song.pcm[track]
-        gate = variant.starts.get(track, 0.0) if settings.mode == 'auto' else 0.0
+        gate = variant.starts.get(track, 0.0) if settings.mode == 'auto' and (not getattr(song, 'audio_override', False)) else 0.0
         source_start = frame - round(settings.audio_offset * RATE)
         left = max(0, -source_start, round((gate + settings.audio_offset) * RATE) - frame)
         right = min(count, len(audio) - source_start)
@@ -48,6 +48,15 @@ def mix_block(song, variant, tracks, frame, count, settings):
     result *= settings.master
     np.clip(result, -1, 1, out=result)
     return result
+
+def playback_duration(song, variant, settings, tracks=None):
+    """End time of the enabled sources, including signed output offsets."""
+    tracks = selected_tracks(song, variant, settings.mode) if tracks is None else tracks
+    ends = [0.0]
+    if settings.mode != 'audio':
+        ends.append(variant.duration + settings.midi_offset)
+    ends.extend((len(song.pcm[t]) / RATE + settings.audio_offset for t in tracks))
+    return max(1 / RATE, *ends)
 
 class PlayerEngine:
 
@@ -135,11 +144,11 @@ class PlayerEngine:
         if missing:
             raise ValueError(f'Missing SD3 audio resource {missing}; select the matching SD3 or use MIDI only')
         if settings.mode != 'midi' and (not song.pcm) and (settings.mode in ('audio', 'mix')):
-            raise ValueError('No SD3 loaded')
+            raise ValueError('No audio file is loaded')
         with self.lock:
             self.song, self.variant, self.settings, self.tracks = (song, variant, settings, tracks)
             self.frame = 0
-            self.duration = max([variant.duration + max(0, settings.midi_offset)] + [len(song.pcm[t]) / RATE + max(0, settings.audio_offset) for t in tracks])
+            self.duration = playback_duration(song, variant, settings, tracks)
             self.times = [e.time + settings.midi_offset for e in variant.events]
             self.cursor = 0
         try:
@@ -255,6 +264,14 @@ class PlayerEngine:
                     elif name == 'mix':
                         with self.lock:
                             self.settings.master, self.settings.gains = args
+                    elif name == 'unload':
+                        self._dispose()
+                        with self.lock:
+                            self.song = self.variant = None
+                            self.frame = 0
+                            self.duration = 0
+                            self.tracks, self.times = ([], [])
+                            self.cursor = 0
                     elif name == 'close':
                         self._dispose()
                         self.closed = True

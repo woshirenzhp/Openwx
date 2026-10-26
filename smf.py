@@ -58,11 +58,22 @@ def load_smf_song(paths, progress=lambda text: None):
             events.append(MidiEvent(at(tick), port, data, order, base + index))
         duration = max(duration, at(file_end))
     events.sort(key=lambda event: event.time)
-    if not events:
+    from xf_lyrics import read_midi
+    lyric_cues, lyric_source, lyric_warnings = ([], '', [])
+    for path in paths:
+        try:
+            found = read_midi(path)
+            if found:
+                lyric_cues, lyric_source = (found, path.name)
+                duration = max(duration, max((c.end for c in found)))
+                break
+        except (ValueError, OSError, EOFError, UnicodeError) as ex:
+            lyric_warnings.append('MIDI lyric import: ' + str(ex))
+    if not events and (not lyric_cues):
         raise ValueError('The selected SMF files contain no playable MIDI messages')
     duration = max(duration, 1 / 44100)
     if len(paths) > 1:
         warnings.append('SMF files start at the same time and retain their own tempo maps; song durations are not automatically aligned.')
     warnings.append('Original SMF channels are preserved. Tracks on the same port/channel share programs and controllers; use separate ports for independent sounds.')
     variant = Variant(0, 0, [], {}, events, duration, 0, total_notes, warnings, parts=parts, label='SMF')
-    return Song(paths[0], None, [variant], [], [])
+    return Song(paths[0], None, [variant], [], lyric_warnings, lyric_cues=lyric_cues, lyric_source=lyric_source, music_paths=paths)

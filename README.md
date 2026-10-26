@@ -1,12 +1,52 @@
 # MI3 + SD3 Sync Player
 
-**Openjs-wx 0.7 English edition — Windows 10/11, 64-bit**
+New in 0.15: .opw reference / .opx packed projects; positioned ASS karaoke syllables are reconstructed into complete sentences with their original timing. Legacy project files remain readable. See [Projects](PROJECTS.md).
 
-This is a separate English edition of version 0.7. The interface, dialogs, status messages, error messages and documentation are in English. Song titles, track names and lyric content retain their original language. Playback and file formats are unchanged.
+New in 0.13: a live lyric editor accessible from preview windows, reversible line edits, preserved timing for unchanged text, and 1 ms character nudges.
+
+## Edit lyrics while previewing
+
+1. Click **Edit lyrics... F2** below the video preview, press F2 in either video/green-screen preview, or use its right-click menu. Multiple previews share the current live editor. Green-screen controls start hidden; F10 toggles the control bar.
+2. **Auto-commit line input** and **Auto apply** start enabled. After a 350 ms typing pause, valid text and display/sing/clear times are committed without moving the text cursor, then applied to previews. Invalid drafts remain in the fields for correction. Disable auto-commit to use **Commit line** explicitly.
+3. Add a line at the current playhead, delete selected lines, undo/redo, or delete everything and start again. **Find current lyric line** selects the active line; double-clicking a row or using the seek button moves playback. Editing does not stop preview playback.
+4. Text-difference matching preserves unchanged characters' timing and remaps their indices. New/replaced characters remain untimed. Editing inside a multi-character syllable clears that syllable's timing rather than inventing character times; other complete syllables remain. Undo is available; split syllables explicitly before refining them.
+5. Select one or more timed characters and set a **Character nudge step ms** (1–60000 ms). Nudge Start, End or Move with − / +, type times to 0.001 s, drag handles, or mark start with F7 and end/next with F8. New text can use an explicitly estimated equal-division draft before calibration. Character times must remain inside the line's display/clear interval.
+6. Applied edits update every preview and subsequent video exports. Save JSON/CSV for complete character timing, or use the supported subtitle formats. The temporary video lyric offset is not baked into text subtitle exports. Live application does not automatically save a file; source songs remain unchanged.
+7. Loading another song or replacing lyrics elsewhere protects the new lyrics from an older editor. F2 then opens a fresh current editor; the old draft can still be saved separately.
+
+New in 0.12: embedded MIDI/XF lyrics and XF, SRT, VTT, ASS, SSA, TTML, DFXP and SCC import/export. See [Lyric formats and compatibility](SUBTITLE_FORMATS.md). Use the lyric import/export buttons or the character timeline. The bundled lyric-only XF example can be loaded in the main window.
+
+**Openjs-wx 0.15 English edition — Windows 10/11, 64-bit**
+
+## Audio-only / MIDI-only sessions and manual PCM offset
+
+For audio only, leave the first input empty, select SD3 or supported audio in the second input, and click **Load files**. **Audio only** mode is selected automatically. For music only, select MI3 or MIDI and leave the audio input empty; **MIDI only** is selected automatically. Both sessions support playback and MP4 or transparent ProRes MOV video export without the other input. Audio-only sessions also look for matching LRC/ASS files; lyrics can be imported or edited separately.
+
+Enter milliseconds in **Audio/PCM offset ms** and click **Apply settings (restart)**. Decimal values are accepted, within +/-86400000 ms (24 hours). Positive values add leading silence; negative values trim the beginning and advance the audio. Playback and **Current audio mix** video export share this offset. After applying settings, the default export duration updates when following the main player, retaining the delayed audio tail. MIDI offset remains limited to +/-10000 ms.
+
+MIDI-only video export defaults to **No audio** and does not require SD3. MIDI playback uses the selected external ports; exported videos do not capture or synthesize that instrument's sound. Audio-only command line: `runtime\python.exe app.py --audio "D:\backing.flac"`.
+
+## Freely paired music and audio inputs
+
+The first input accepts MI3 or standard MIDI (`.mid`, `.midi`, or SMF-based `.kar`). Use the multiple-SMF button for simultaneous MIDI files, each retaining its tempo map and A/B/C/D routing. SMF types 0/1 with PPQN timing are supported; asynchronous type 2 and SMPTE timing are not supported.
+
+The second input is optional and accepts SD3, WAV, AAC, MP3, FLAC, APE or ALAC. AAC and ALAC in `.m4a` containers are supported. Files need not share a name. Changing the music input keeps the selected audio. The first audio stream in a container is decoded.
+
+External audio is decoded in memory to 44.1 kHz stereo float32 PCM and begins at song time zero. Other sample rates and channel layouts are resampled. Raw headerless `.pcm` files are not supported because sample rate and channel information is missing. Source files remain unchanged.
+
+Auto mode preserves native MDT recording links and gates for MI3 + SD3. MI3 + external audio, MIDI + SD3 and MIDI + external audio play the complete audio timeline from zero, using the existing audio offset, gain, pause and seek controls. Multiple MIDI files share the audio selected in the second input.
+
+Choose **Current audio mix** to include this audio in video export with the same offset and gain. External MIDI synthesizer sound is not captured or synthesized into the exported audio.
+
+The entire audio is decoded into memory, using approximately 20.2 MiB per minute. The bundled runtime includes the APE decoder. Real encode/decode regression tests cover WAV, AAC, MP3, FLAC and ALAC; no real APE sample was available for an end-to-end test.
+
+Command-line aliases: `runtime\python.exe app.py --music "D:\song.mid" --audio "D:\backing.flac"`. The original `--mi3` and `--sd3` arguments remain valid.
+
+This is a separate English edition of version 0.15. The interface, dialogs, status messages, error messages and documentation are in English. Song titles, track names and lyric content retain their original language. Playback and file formats are unchanged.
 
 ## Start the portable player
 
-1. Extract **all** files from `MI3_SD3_Sync_Player_Portable_Openjs-wx_0.7_EN.zip`.
+1. Extract **all** files from `MI3_SD3_Sync_Player_Portable_Openjs-wx_0.15_EN.zip`.
 2. Open the `MI3_SD3_Player_EN` folder.
 3. Double-click `start_player.cmd`.
 
@@ -16,7 +56,7 @@ Songs are not included. `start_sample.cmd` looks for `CE000001.MI3` and `CE00000
 
 ## Load and play a song
 
-1. Browse for an MI3 file. A same-named SD3 in the same folder is selected automatically.
+1. Browse for MI3 or MIDI and optionally select SD3 or external audio. An empty audio field can be filled automatically with a same-named SD3.
 2. Click **Load files** and wait for decoding to finish.
 3. Select a **Music resource** and **Playback mode**.
 4. Choose an **Audio output** and, when needed, MIDI output devices.
@@ -26,14 +66,14 @@ Available playback modes:
 
 | Mode | Behavior |
 |---|---|
-| Auto: MDT-linked audio | Uses the audio resources referenced by the selected MDT |
-| Manual: all audio + MIDI | Mixes the available SD3 audio with MIDI |
-| Audio only | Plays the SD3 audio without MIDI |
-| MIDI only | Sends MIDI without SD3 audio |
+| Auto: native links / full external audio | Native MI3 + SD3 follows MDT links; arbitrary pairs use the complete audio |
+| Manual: all audio + MIDI | Mixes the available audio with MIDI |
+| Audio only | Plays the audio without MIDI |
+| MIDI only | Sends MIDI without audio |
 
 Changing devices, offsets or track routing requires **Apply settings (restart)**, which resets playback position. Audio master and individual audio-track levels take effect immediately. They do not control external MIDI synthesizer volume.
 
-Audio and MIDI offsets are in milliseconds. Positive values delay that output; negative values advance it. The range is -10000 to +10000 ms. Data before the song's starting position is trimmed when a negative offset is used.
+Audio and MIDI offsets are in milliseconds. Positive values delay that output; negative values advance it. Audio accepts +/-86400000 ms (24 hours); MIDI accepts +/-10000 ms. Data before the song's starting position is trimmed when a negative offset is used.
 
 Pause, stop and seek release active notes. Resuming reconstructs controller state and notes that should still be sounding. Original device sounds, proprietary controls, mixing and hardware latency are not fully reproduced.
 
@@ -49,7 +89,7 @@ MIDI is sent to external or software synthesizers. Choosing no MIDI output track
 
 ## Load multiple standard MIDI files
 
-Click **Load SMF files...** and use Ctrl/Shift to select `.mid` or `.midi` files. This replaces the current MI3 session and selects MIDI-only playback. It does not layer those files over the current SD3 session.
+Click **Load SMF files...** and use Ctrl/Shift to select `.mid` or `.midi` files. This replaces the current music session and uses the SD3 or external audio selected in the second input. With audio, Auto mode is selected; without audio, MIDI-only playback is selected.
 
 SMF type 0 and type 1 are supported. Each file keeps its own tempo map and all files start at the same time. Their song lengths are not automatically aligned. Every SMF track is retained, including setup/tempo tracks. Channels within a type-0 track are not automatically split into separate tracks. Type 2 and SMPTE time division are not supported.
 
@@ -158,7 +198,7 @@ Transparent MOV uses ProRes 4444 (`ap4h`) with an alpha-capable pixel format. It
 
 Supported presets are 640x360, 1280x720 and 1920x1080 at 24/25/30 fps. Duration must be greater than zero and no more than 24 hours. A MOV export can be much larger than an MP4.
 
-Audio choices are **No audio**, **Input video audio** and **Current SD3 mix**. External MIDI synthesizer sound is not recorded into exported files. Select the SD3 mix only after loading and applying the matching song settings.
+Audio choices are **No audio**, **Input video audio** and **Current audio mix**. External MIDI synthesizer sound is not recorded into exported files. Select the current mix after loading and applying the audio settings.
 
 Export runs in a background thread. Preview and export use independent decoders. Cancel removes the incomplete output. Existing videos are never overwritten.
 
@@ -198,4 +238,28 @@ The dependency check opens and closes a hidden player window and enumerates audi
 
 The portable runtime includes Python 3.12 x64, Tk, NumPy, PyAV/FFmpeg, Pillow, sounddevice/PortAudio, mido and their dependencies. `python312._pth` isolates it from user-installed Python packages. Keep the runtime's license and package metadata files. See `portable_manifest.json` for package versions and runtime hashes, and `localization_manifest.json` for English-edition details.
 
-For development outside the portable runtime, use Python with Tk and install `requirements.txt`. `build_portable.py` builds an offline Windows Python 3.12 x64 package; `--repack` packages an existing runtime. Source conversion to this edition replaces application string constants; MIDI/audio algorithms and timing structures retain the 0.7 behavior.
+For development outside the portable runtime, use Python with Tk and install `requirements.txt`. `build_portable.py` builds an offline Windows Python 3.12 x64 package; `--repack` packages an existing runtime. Source conversion to this edition replaces application string constants; MIDI/audio algorithms and timing structures retain the 0.8 behavior.
+
+
+## Version 0.8: firmware-derived timing corrections
+
+Timing recognition now uses the original display_cs, sing_cs and clear_cs fields directly. Sweep rate is speed_raw*multiplier//100. Pixel increments use the difference of integer positions at absolute 100 Hz clocks, matching the verified MIPS arithmetic. Estimated character boundaries are inverted on the native centisecond clock instead of interpolating continuously between event endpoints.
+
+A pause exactly between characters now delays the next character until motion resumes. Main/sub lanes remain independent, and simultaneous controls retain their file order. Arithmetic outside the verified 32-bit range produces an explicit error rather than silently generating timing.
+
+Substitute font metrics still make character timestamps estimates. Provenance is estimated-speed-font-v2-cs, or estimated-speed-width-v2-cs without the font. Lines with no usable motion retain a labeled fallback. Existing imported JSON/CSV and manual timing edits are preserved. Linear within-character coloring and both line-advance modes remain available.
+
+Both language editions share the identical lyric_clock.py module. Each edition passes 44 regression tests, including original MIPS arithmetic cases, pause boundaries and independent per-tick accumulation for all six real SNG resources. JSON template metadata describes the native 100 Hz clock and estimated character timing explicitly.
+
+
+## Version 0.12: lyric visibility timing
+
+Open **Visibility timing...** from the video/lyrics panel. Enable **Enable visibility timing**, adjust the sliders or millisecond fields, then click **Apply**. This feature is off by default to preserve previous behavior. **Restore illustrated defaults** enables it and sets: normal lead 4000ms, hold 2000ms, fade-in 200ms, fade-out 200ms, early filling on, maximum lead 6000ms. Click Apply after restoring defaults.
+
+The normal lead is measured before the first sung character of each displayed row. The hold begins after its last character completes, followed by the fade-out. Fades use a smooth easing curve; character color sweeps remain linear. Values accept integers from 0 to 60000ms; zero fade means an immediate appearance/disappearance. With early filling enabled, maximum lead cannot be smaller than normal lead.
+
+Early filling schedules fixed screen slots independently: once a row has finished its hold and fade-out, the next row can occupy that slot up to the maximum lead before singing. This overrides whole-screen replacement. With early filling off and per-line advance off, the next group waits until the current group finishes all holds/fades. Per-line advance also respects hold/fade duration while these settings are enabled and uses fixed-slot replacement. If no slot is available, display may occur later than the preferred lead. No song, audio/MIDI, lyric offsets or character timestamps are shifted.
+
+Opacity affects lyrics and strokes only, never the video/image background. Transparent MOV retains straight alpha, including partially opaque edges. Preview, MP4 and MOV share the same deterministic schedule; seeking restores the appropriate state. Long-line wrapping and screen capacity remain active. Settings apply to the current session and are not yet persisted across launches.
+
+Six new regression checks cover scheduling, limits, zero durations, fade opacity, seeking, MOV readback and dialog validation/cleanup. Each language edition has 50 regression tests.

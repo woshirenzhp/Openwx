@@ -96,9 +96,12 @@ def restore_ca02(ca):
             raise ValueError('Index and audio frames do not match')
     return bytes(audio[:p])
 
-def decode_pcm(aac):
+def decode_audio(source, format=None):
+    """Decode the first audio stream to a zero-based 44.1 kHz stereo PCM timeline."""
     chunks = []
-    with av.open(io.BytesIO(aac), format='aac') as container:
+    with av.open(source, format=format) as container:
+        if not container.streams.audio:
+            raise ValueError('The input file has no audio stream')
         resampler = av.AudioResampler(format='fltp', layout='stereo', rate=RATE)
         for frame in container.decode(audio=0):
             for converted in resampler.resample(frame):
@@ -106,8 +109,11 @@ def decode_pcm(aac):
         for converted in resampler.resample(None):
             chunks.append(converted.to_ndarray().T.copy())
     if not chunks:
-        raise ValueError('AAC decoding produced no samples')
+        raise ValueError('The audio file decoded to no samples')
     return np.ascontiguousarray(np.concatenate(chunks), dtype=np.float32)
+
+def decode_pcm(aac):
+    return decode_audio(io.BytesIO(aac), format='aac')
 
 @dataclass
 class MidiEvent:
@@ -256,33 +262,62 @@ def make_variant(data, index):
 
 @dataclass
 class Song:
-    mi3: Path
+    mi3: Path | None
     sd3: Path | None
     variants: list
     pcm: list
     warnings: list
+    audio_override: bool = False
+    lyric_cues: list = field(default_factory=list)
+    lyric_source: str = ''
+    music_paths: list = field(default_factory=list)
 
-def load_song(mi3, sd3=None, progress=lambda message: None):
-    mi3 = Path(mi3)
-    progress('Unpacking MI3 music resources...')
-    variants = [make_variant(d, i) for i, d in enumerate(read_mi3(mi3))]
+def load_song(mi3=None, sd3=None, progress=lambda message: None):
+    paths = [Path(p) for p in mi3] if isinstance(mi3, (list, tuple)) else [Path(mi3)] if mi3 else []
+    if not paths and (not sd3):
+        raise ValueError('Select at least one music or audio file')
+    mi3 = paths[0] if paths else None
+    is_smf = False
+    if mi3:
+        with mi3.open('rb') as source:
+            is_smf = source.read(4) == b'MThd'
+    if not mi3:
+        variants = [Variant(0, 0, [], {}, [], 0, 0, 0, label='Audio')]
+    elif is_smf:
+        from smf import load_smf_song
+        music = load_smf_song(paths, progress)
+        variants = music.variants
+    else:
+        if len(paths) != 1:
+            raise ValueError('Multiple-file loading requires standard MIDI files')
+        progress('Unpacking MI3 music resources...')
+        variants = [make_variant(d, i) for i, d in enumerate(read_mi3(mi3))]
     pcm = []
-    warnings = []
+    warnings = list(music.warnings) if is_smf else []
+    audio_override = is_smf or mi3 is None
     if sd3:
         sd3 = Path(sd3)
-        data = sd3.read_bytes()
-        if data[:4] != b'SD3D' or struct.unpack_from('<I', data, 4)[0] != 1:
-            raise ValueError('SD3D version 1 is required')
-        top = resources(data)
-        if len(top) != 1 or top[0][:4] != b'SN3\x01':
-            raise ValueError('A single SN3 version 1 resource is required')
-        for i, ca in enumerate(resources(top[0])):
-            progress(f'Decoding SD3 audio track {i}…')
-            pcm.append(decode_pcm(restore_ca02(ca)))
-        if mi3.stem.casefold() != sd3.stem.casefold():
-            warnings.append('MI3 and SD3 filenames differ; verify that they belong to the same song')
-    for variant in variants:
-        missing = [i for i in variant.selected if i >= len(pcm)]
-        if missing:
-            warnings.append(f'MDT {variant.index} selects audio {missing}, but the matching SD3 was not provided')
-    return Song(mi3, sd3, variants, pcm, warnings)
+        with sd3.open('rb') as source:
+            is_sd3 = source.read(4) == b'SD3D'
+        if is_sd3:
+            data = sd3.read_bytes()
+            if len(data) < 8 or struct.unpack_from('<I', data, 4)[0] != 1:
+                raise ValueError('SD3D version 1 is required')
+            top = resources(data)
+            if len(top) != 1 or top[0][:4] != b'SN3\x01':
+                raise ValueError('A single SN3 version 1 resource is required')
+            for i, ca in enumerate(resources(top[0])):
+                progress(f'Decoding SD3 audio track {i}…')
+                pcm.append(decode_pcm(restore_ca02(ca)))
+            if mi3 and (not is_smf) and (mi3.stem.casefold() != sd3.stem.casefold()):
+                warnings.append('MI3 and SD3 filenames differ; verify that they belong to the same song')
+        else:
+            progress('Decoding external audio...')
+            pcm.append(decode_audio(str(sd3)))
+            audio_override = True
+    if not audio_override:
+        for variant in variants:
+            missing = [i for i in variant.selected if i >= len(pcm)]
+            if missing:
+                warnings.append(f'MDT {variant.index} selects audio {missing}, but the matching SD3 was not provided')
+    return Song(mi3, sd3, variants, pcm, warnings, audio_override, music.lyric_cues if is_smf else [], music.lyric_source if is_smf else '', paths)
